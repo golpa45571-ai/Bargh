@@ -118,12 +118,12 @@ def sva(x0, y0, x1, y1, power=False):
         text((x0 + x1) / 2, y1 - 22, 'POWER SUPPLY', 17)
 
 sva(800, 320, 1110, 510, power=True)
-sva(800, 510, 1110, 700)
+sva(800, 560, 1110, 750)
 for i, (name, ph, y) in enumerate(grp[:3]):
     dashed([(phX[ph] + 24, y), (700, y), (700, 352 + i * 25), (800, 352 + i * 25)], w=2, fill=INST, dash=8, gap=6)
 for i, (name, ph, y) in enumerate(grp[3:]):
-    dashed([(phX[ph] + 24, y), (712, y), (712, 572 + i * 25), (800, 572 + i * 25)], w=2, fill=INST, dash=8, gap=6)
-for base in (400, 590):
+    dashed([(phX[ph] + 24, y), (712, y), (712, 622 + i * 25), (800, 622 + i * 25)], w=2, fill=INST, dash=8, gap=6)
+for base in (400, 640):
     for k, bn in enumerate(('L1', 'L2', 'L3', 'N')):
         yy = base + k * 25
         dashed([(1110, yy), (1158, yy), (1158, busY[bn])], w=2, fill=INST, dash=8, gap=6)
@@ -152,6 +152,12 @@ def feeder(cx, poles, phases, tag=None, amp=None):
 
 feeder(1250, 1, ['L1'])
 text(1250, 1022, 'Lighting', 24, bold=True)
+# 002: second bridge symbol in series below the pole + small aux unit on branch
+line([(1250, 700), (1250, 718)], w=4); dot(1250, 700, 4); dot(1250, 718, 4)
+d.line([(1244, 716), (1268, 694)], fill=BLACK, width=4)
+line([(1250, 718), (1250, AY)], w=4)
+dashed([(1250, 660), (1330, 660)], w=2, fill=BLACK, dash=6, gap=5)
+d.rectangle([1330, 636, 1420, 684], outline=BLACK, width=3)
 feeder(1480, 3, ['L1', 'L2', 'L3'], tag='Q1', amp='100A')
 feeder(1710, 3, ['L1', 'L2', 'L3'], tag='Q2', amp='100A')
 feeder(1940, 3, ['L1', 'L2', 'L3'], tag='Q3', amp='100A')
@@ -167,10 +173,9 @@ for k, x in enumerate(xs5):
     mccb_pole(x, FY0, FY1)
     line([(x, FY1), (x, AY)])
 tie(xs5, 540)
-for bn, off in (('N', -120), ('PE', 120)):
-    x = q5x + off
-    line([(x, busY[bn]), (x, AY)], w=3)
-    dot(x, busY[bn], 4)
+x = q5x - 120
+line([(x, busY['N']), (x, AY)], w=3)
+dot(x, busY['N'], 4)
 line([(xs5[0], AY), (xs5[-1], AY)], w=3)
 arrow_down(q5x, AY + 34)
 text(q5x + 104, 465, 'Q5', 26, bold=True, anchor='lm', knockout=True)
@@ -195,18 +200,20 @@ for k, bn in enumerate(('L1', 'L2', 'L3', 'N')):
     dashed([(2660, busY[bn]), (2702, busY[bn]), (2702, yy), (2040, yy)], w=2, fill=INST, dash=8, gap=6)
 
 # ======================= CONTROL (002 + 005) =======================
-for tx, ty in ((350, 1340), (470, 1540)):
+for tx, ty in ((350, 1340), (350, 1500)):
     dot(tx, busY['L1'], 4)
     dashed([(tx, busY['L1']), (tx, ty)], w=2, fill=INST, dash=9, gap=6)
+# PSU #1: protector left of box, wired into box left edge
 mccb_pole(350, 1340, 1410, w=3)
 text(310, 1375, 'Q0', 23, bold=True, anchor='rm')
-line([(350, 1410), (350, 1435)], w=3)
+line([(350, 1410), (350, 1375), (430, 1375)], w=3)
 d.rectangle([430, 1320, 750, 1430], outline=BLACK, width=3)
 text(590, 1358, 'POWER SUPPLY', 21)
 text(590, 1396, 'AC 230V', 25, bold=True)
-mccb_pole(470, 1540, 1610, w=3)
-text(430, 1575, 'Q5', 23, bold=True, anchor='rm')
-line([(470, 1610), (470, 1510)], w=3)
+# PSU #2: protector left of box (same column), wired into box left edge
+mccb_pole(350, 1500, 1570, w=3)
+text(310, 1535, 'Q5', 23, bold=True, anchor='rm')
+line([(350, 1570), (350, 1590), (430, 1590)], w=3)
 d.rectangle([430, 1510, 750, 1620], outline=BLACK, width=3)
 text(590, 1548, 'POWER SUPPLY', 21)
 text(590, 1586, 'AC 230V', 25, bold=True)
