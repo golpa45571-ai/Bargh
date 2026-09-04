@@ -380,7 +380,10 @@ for j in range(3):
     sz(qx[j] - 2.0, 147.3, '1*2.5mm²', rot=90, size=5.5, bbox=True)
 for j, k in enumerate(['R', 'S', 'T']):
     line(qx[j], 127.5, qx[j], 119.5, C[k], 1.4)
-    wn(qx[j] + 1.0, 130.5, str(50 + j), size=5.9)
+    if j < 2:
+        wn(qx[j] + 1.0, 130.5, str(50 + j), size=5.9)
+    else:
+        wn(qx[j] - 1.0, 130.5, '52', size=5.9, ha='right')
 line(404, by['E'], 404, 112, C['gray'], 0.9); tapdot(404, by['E'], C['E'], 0.7)
 line(407.5, by['E'], 407.5, 112, C['gray'], 0.9); tapdot(407.5, by['E'], C['E'], 0.7)
 txt(402.9, 112.3, '53', size=5.5, color='#667', ha='right', bbox=True)
