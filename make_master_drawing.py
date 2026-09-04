@@ -383,8 +383,8 @@ for j, k in enumerate(['R', 'S', 'T']):
     wn(qx[j] + 1.0, 130.5, str(50 + j), size=5.9)
 line(404, by['E'], 404, 112, C['gray'], 0.9); tapdot(404, by['E'], C['E'], 0.7)
 line(407.5, by['E'], 407.5, 112, C['gray'], 0.9); tapdot(407.5, by['E'], C['E'], 0.7)
-txt(403.1, 118.5, '53', size=5.5, color='#667', ha='right', bbox=True)
-txt(406.6, 118.5, '54', size=5.5, color='#667', ha='right', bbox=True)
+txt(402.9, 112.3, '53', size=5.5, color='#667', ha='right', bbox=True)
+txt(406.4, 112.3, '54', size=5.5, color='#667', ha='right', bbox=True)
 arrD(404, 112, 108.5, C['gray']); arrD(407.5, 112, 108.5, C['gray'])
 K2Y, _ = meter(414, 106, 30, 27.5, 'KWH2',
                   ['I1+', 'I1-', 'I2+', 'I2-', 'I3+', 'I3-'])
