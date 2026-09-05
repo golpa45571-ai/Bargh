@@ -224,46 +224,54 @@ for i, px in enumerate(FXx):
 txt(246.5, 166.6, 'F.KWH1&SIG', size=6.6, weight='bold')
 txt(246.5, 164.1, '6A 3PHASE', size=5.9)
 txt(246.5, 161.7, 'Type:C', size=5.9)
-tapdot(238, by['N'], C['N'])
-line(238, by['N'], 238, 118.5, C['gray'], 0.9)
-wn(239.6, 172.6, '41', size=5.7)
-# meter voltage taps -> land on the F.KWH1&SIG output drops (junction dots, per master)
-def _taprow(mx, yy, num, fx, cc, nm=None):
+tapdot(227.6, by['N'], C['N'])
+line(227.6, by['N'], 227.6, 118.5, '#222', 0.95)
+wn(228.8, 172.6, '41', size=5.7)
+# ---- meter taps: nets exactly as drawn in the master ----
+def _seat(mx, yy, num, nm=None):
     term(mx, yy, '#333', 0.7)
     if nm: txt(mx - 2.2, yy + 0.8, nm, size=4.8, ha='right', color='#345')
     wn(mx + 1.6, yy + 1.15, num, size=5.7)
-    if fx:
-        line(mx + 0.7, yy, fx, yy, cc, 1.0)
-        dot(fx, yy, cc, 0.62)
-    else:
-        line(mx + 0.7, yy, mx + 6.4, yy, cc, 1.0)
-        dot(mx + 6.4, yy, cc, 0.6)
-for yy, num, cc, nm in [(170, '23', C['cyan'], None), (165.5, '24', C['red2'], None)]:
-    _taprow(162, yy, num, None, cc, nm)
-for yy, num, fx, cc, nm in [(161, '25', 238, C['N'], 'N'), (156.5, '26', 216, C['R'], 'L1'),
-                            (152, '27', 223.5, C['S'], 'L2'), (147.5, '28', 231, C['T'], 'L3')]:
-    _taprow(162, yy, num, fx, cc, nm)
-for yy, num, fx, cc, nm in [(140, '29', 238, C['N'], 'N'), (135.5, '30', 216, C['R'], 'L1'),
-                            (131, '31', 223.5, C['S'], 'L2'), (126.5, '32', 231, C['T'], 'L3')]:
-    _taprow(162, yy, num, fx, cc, nm)
-term(162, 122, '#333', 0.7); wn(163.6, 123.1, '33', size=5.7)
-line(162.7, 122, 171, 122, '#111', 1.05)
-line(171, 122, 171, 96, '#111', 1.05)
-term(162, 117.5, '#333', 0.7); wn(163.6, 117.5, '34', size=5.7)
+for yy, num, nm in [(170, '23', None), (165.5, '24', None), (161, '25', 'N'), (156.5, '26', 'L1'),
+                    (152, '27', 'L2'), (147.5, '28', 'L3'), (140, '29', 'N'), (135.5, '30', 'L1'),
+                    (131, '31', 'L2'), (126.5, '32', 'L3'), (122, '33', None), (117.5, '34', None)]:
+    _seat(162, yy, num, nm)
+# N net: N bus -> 23 -> 25 -> 29 (one cyan conductor, as master draws)
+tapdot(171, by['N'], C['N'])
+line(171, by['N'], 171, 140, C['N'], 1.05)
+line(162.7, 161, 171, 161, C['N'], 1.05)
+line(162.7, 140, 171, 140, C['N'], 1.05)
+line(162.7, 170, 167.6, 170, C['N'], 1.05)
+line(167.6, 170, 167.6, 161, C['N'], 1.05)
+dot(167.6, 161, C['N'], 0.55)
+# L net: 24 -> down -> 26 -> drop 38 ; 30 -> drop 38
+line(162.7, 165.5, 175.6, 165.5, C['R'], 1.0)
+line(175.6, 165.5, 175.6, 156.5, C['R'], 1.0)
+line(162.7, 156.5, 216, 156.5, C['R'], 1.0)
+dot(175.6, 156.5, C['R'], 0.5)
+line(162.7, 135.5, 216, 135.5, C['R'], 1.0)
+# S net: 27 & 31 -> drop 39
+line(162.7, 152, 223.5, 152, C['S'], 1.0)
+line(162.7, 131, 223.5, 131, C['S'], 1.0)
+# T net: 28 & 32 -> drop 40
+line(162.7, 147.5, 231, 147.5, '#8f9296', 1.0)
+line(162.7, 126.5, 231, 126.5, '#8f9296', 1.0)
+for dxx2, dyy2, dcc2 in [(216, 156.5, C['R']), (223.5, 152, C['S']), (231, 147.5, C['T']),
+                         (216, 135.5, C['R']), (223.5, 131, C['S']), (231, 126.5, C['T'])]:
+    dot(dxx2, dyy2, dcc2, 0.55)
+# 33 / 34 : terminal marks only — master draws no conductor there
 SBx, SBy, SBw, SBh = 209, 104, 34, 14.5
 ax.add_patch(Rectangle((SBx, SBy), SBw, SBh, fc='white', ec=C['cyanec'], lw=1.15, zorder=4))
-for i, px in enumerate(FXx):
-    txt(px, SBy + SBh - 2.0, ['R H1', 'S H2', 'T H3'][i], size=5.7, ha='center', color=C['green2'], weight='bold')
-    term(px, SBy + 3.0, '#111', 0.7)
-    wn(px + 1.3, SBy + 3.0, str(42 + i), size=5.9)
-for i in range(6):
-    ty = SBy + SBh - 1.7 - i * 2.05
-    term(SBx, ty, C['red2'], 0.6)
-    wn(SBx - 5.6, ty, str(5 + i), size=5.4, ha='right')
-    if i in (0, 5):
-        continue
-    line(SBx - 1.6, ty, SBx - 4.8, ty, '#111', 0.9)
-    arrL(SBx - 4.8, SBx - 7.0, ty, '#111')
+for i, (px, cc) in enumerate(zip(FXx, [C['R'], C['S'], C['T']])):
+    txt(px - 0.2, SBy + SBh - 2.0, ['R H1', 'S H2', 'T H3'][i], size=5.7, ha='center', color=C['green2'], weight='bold')
+    ax.plot([px, px], [111.6, 108.2], color=cc, lw=1.1, zorder=6, solid_capstyle='round')
+    ax.plot([px - 0.8, px + 0.8], [109.9, 109.9], color=cc, lw=1.1, zorder=6)
+    wn(px + 1.5, 106.0, str(42 + i), size=5.9, ha='left')
+for px in FXx:
+    ax.plot([px, px], [108.2, 104.0], color=C['cyan'], lw=1.0, zorder=6)
+line(216, 104, 243, 104, C['cyan'], 1.0)
+line(243, 104, 243, by['N'], C['cyan'], 1.0)
+dot(243, by['N'], C['cyan'], 0.6)
 
 # =====================================================================
 # ZONE 002
@@ -281,18 +289,13 @@ def ckt(y, tapk, w1, fz, w2, x_end, col):
         line(tx + 1.2, y, x_end, y, col, 1.2)
     if w2: wn(x_end - 4.4, y + 1.3, w2, size=6.1)
     sz(87, y + 1.4, '1*1.5mm²', size=5.9, bbox=True)
-ckt(74, 'R', '9', 'F.CONTROL', '10', 201.5, '#111')
-line(201.5, 74, 201.5, 106.55, '#111', 1.1)
-line(201.5, 106.55, 209, 106.55, '#111', 1.1)
-ckt(68.5, 'S', '7', 'F.SOCKET', '8', 120, C['red2'])
-line(120, 68.5, 126, 68.5, C['red2'], 1.1)
-switch1(126, 68.5, '', up=False)
-txt(126, 73.9, 'S0', size=6.0, ha='center', color=C['mag'], weight='bold', bbox=True)
-line(126, 66.6, 126, 63.0, '#111', 0.95)
-note(128.5, 61.4, 'socket outlet', size=5.2)
-ckt(63, 'T', '6', 'F.LIGHTING', '5', 203.2, C['red2'])
-line(203.2, 63, 203.2, 116.8, C['red2'], 1.1)
-line(203.2, 116.8, 209, 116.8, C['red2'], 1.1)
+ckt(74, 'R', '9', 'F.CONTROL', '10', 222.7, '#111')
+term(222.7, 62, '#111', 0.65)
+line(222.7, 74, 222.7, 62, '#111', 1.05)
+ckt(68.5, 'S', '7', 'F.SOCKET', '8', 112.4, C['red2'])
+dot(112.4, 68.5, C['red2'], 0.95)
+txt(114.2, 70.1, 'S0', size=5.6, ha='left', color=C['green2'], weight='bold', style='italic')
+ckt(63, 'T', '6', 'F.LIGHTING', '5', 186.5, C['red2'])
 tx = DX['N']; y = 57.5
 dot(tx, y, C['N'], 0.6); line(tx, y, 118, y, C['cyan'], 1.2)
 wn(97, y + 1.3, '1', size=6.1); sz(103, y + 1.4, '1*1.5mm²', size=5.9, bbox=True)
@@ -314,43 +317,32 @@ ax.add_patch(Rectangle((156.2, y - 1.9), 18.5, 3.8, fc='white', ec=C['red2'], lw
 txt(165.4, y, 'Lighting', size=6.2, ha='center', color=C['green2'], weight='bold')
 poly([(174.7, y), (181.5, y), (181.5, 63), (186.5, 63)], C['red2'], 1.05)
 dot(181.5, 63, C['red2'], 0.6)
-note(176.5, y + 1.9, 'load return ties to wire 5', size=4.8)
-# control string
-cx1 = 224.7
-line(cx1, 96, cx1, 75.0, '#111', 1.1)
-line(171, 96, cx1, 96, '#111', 1.05)
-txt(cx1 - 1.3, 77.0, 'X.KWH1  11', size=5.6, ha='right', style='italic')
-xm = aux_box(cx1 - 4.8, 66.5, 'KWH1')
-line(cx1, 66.5, cx1, 62.0, '#111', 1.1); dot(cx1, 62.0)
-txt(cx1 + 1.4, 61.0, 'X.KWH1  12', size=5.6, style='italic')
-sx = 240
-line(cx1, 62.0, sx, 62.0, '#111', 1.1)
-line(sx, 62.0, sx, 72.5, '#111', 1.1)
-term(sx, 72.5, '#111', 0.6)
-line(sx, 72.5, sx, 74.4, '#111', 1.05)
-ax.plot([sx, sx + 2.1], [74.4, 72.6], color='#111', lw=1.05, zorder=5)
-dot(sx + 2.1, 72.6, '#111', 0.5)
-wn(sx + 2.7, 75.4, '23', size=5.6, ha='left')
-line(sx, 72.5, sx, 67.4, '#111', 1.05)
-wn(sx + 1.3, 67.4, '24', size=5.6)
-txt(sx + 4.2, 70.0, 'S1', size=6.0, weight='bold', color=C['mag'])
-sz(sx + 3.2, 65.6, '1*1.5mm²', rot=90, size=5.6)
-QBx, QBy, QBw, QBh = 246, 44, 28, 22
+# control string — exactly as the master draws it
+xmK = aux_box(226.4, 66.5, 'KWH1')
+line(231.9, 75, 231.9, 78.5, '#111', 1.05)
+line(231.9, 78.5, 243.3, 78.5, '#111', 1.05)
+line(243.3, 78.5, 243.3, 74.4, '#111', 1.05)
+term(243.3, 74.4, '#111', 0.6)
+ax.plot([243.3, 245.4], [74.4, 72.6], color='#111', lw=1.05, zorder=5)
+dot(245.4, 72.6, '#111', 0.5)
+line(243.3, 72.6, 243.3, 62, '#111', 1.05)
+line(231.9, 66.5, 231.9, 62, '#111', 1.05)
+txt(241.7, 76.9, 'S1', size=6.0, ha='right', color=C['mag'], weight='bold')
+wn(246.4, 75.8, '23', size=5.4)
+wn(244.7, 63.6, '24', size=5.4)
+txt(230.3, 79.2, 'X.KWH1 11', size=5.0, ha='right', style='italic')
+txt(230.3, 63.6, 'X.KWH1 12', size=5.0, ha='right', style='italic')
+QBx, QBy, QBw, QBh = 218, 40, 32, 22
 ax.add_patch(Rectangle((QBx, QBy), QBw, QBh, fc='white', ec='#111', lw=1.2, zorder=4))
-txt(QBx + 0.8, QBy + QBh - 2.6, 'Q0', size=6.9, weight='bold')
-txt(QBx + 2.2, QBy + 9.4, 'AC 230V', size=5.5); txt(QBx + 2.2, QBy + 7.2, 'POWER SUPPLY', size=5.5)
-shunt(QBx + 11, QBy + 8.2, to_right=0.0)
-txt(QBx + 12.2, QBy + 12.6, 'P1', size=5.6, ha='center'); txt(QBx + 12.2, QBy + 5.8, 'P2', size=5.6, ha='center')
-term(QBx + 9, QBy + QBh, '#111', 0.65); txt(QBx + 7.9, QBy + QBh - 1.8, 'N', size=5.9, weight='bold', ha='right')
-term(QBx + QBw - 5, QBy + QBh, '#111', 0.65); txt(QBx + QBw - 3.9, QBy + QBh - 1.8, 'O', size=5.9, weight='bold')
-line(sx, 67.4, sx, 69.6, '#111', 1.05)
-line(sx, 69.6, QBx + QBw - 5, 69.6, '#111', 1.05)
-line(QBx + QBw - 5, 69.6, QBx + QBw - 5, QBh + QBy, '#111', 1.05)
-line(QBx + 9, QBy + QBh, QBx + 9, 78.5, '#111', 1.05)
-arrU(QBx + 9, 78.5, 80.4, '#111')
-line(QBx + 12.2, QBy, QBx + 12.2, 13.5, '#111', 1.05)
-sz(QBx + 14.2, 28, '1*1.5mm²', rot=90, size=5.6)
-line(QBx + 12.2, 13.5, 272, 13.5, '#111', 1.05)
+txt(217.2, 64.6, 'Q0', size=6.9, weight='bold')
+txt(220.4, 49.6, 'AC 230V', size=4.6, bbox=True); txt(220.4, 47.6, 'POWER SUPPLY', size=4.2, bbox=True)
+shunt(222.7, 51, to_right=0.0)
+txt(221.2, 58.2, 'P1', size=5.4, ha='right'); txt(221.2, 43.6, 'P2', size=5.4, ha='right')
+term(231.9, 62, '#111', 0.65); txt(231.9, 60.2, 'N', size=5.6, weight='bold', ha='center')
+term(243.3, 62, '#111', 0.65); txt(243.3, 60.2, 'O', size=5.6, weight='bold', ha='center')
+line(222.7, 40, 222.7, 13.5, '#111', 1.05)
+sz(224.2, 26.5, '1*1.5mm²', rot=90, size=5.2)
+line(222.7, 13.5, 272, 13.5, '#111', 1.05)
 arrR(272, 275.5, 13.5, '#111')
 txt(274.0, 15.3, 'N0', size=6.7, style='italic', weight='bold')
 
@@ -410,14 +402,10 @@ for i, (nm, dxx, cty) in enumerate([('CT7', 386, 128.6), ('CT8', 392, 117.8), ('
         wn(399.4, yy + 1.0, str(55 + k), size=5.5)
         sz(401.6, yy + 1.0, '1*2.5 mm²', size=4.9)
 txt(374.2, 113.0, '400/5A · SVA', size=5.0, bbox=True)
-line(419, 100, 419, 86, '#111', 1.0); line(419, 86, 294.7, 86, '#111', 1.0)
-txt(346, 84.4, '61 → X.KWH2 11', size=4.9, color=C['note'], style='italic')
-wn(420.1, 92.6, '61', size=5.5)
-px = 426
-poly([(px, 100), (px, 97.5)], '#111', 1.0)
-arrD(px, 97.5, 93.8, '#111')
-wn(px + 1.1, 95.6, '62', size=5.5)
-txt(px + 3.8, 95.6, 'I3-', size=5.0)
+for yy, num in [(106.6, '61'), (100.9, '62')]:
+    line(404.7, yy, 413.1, yy, '#111', 1.0)
+    arrL(400.7, 404.7, yy, '#111')
+    wn(405.5, yy - 1.9, num, size=4.6, ha='left')
 for j, (px, k) in enumerate([(420, 'R'), (427, 'S'), (434, 'T')]):
     tapdot(px, by[k], C[k]); line(px, by[k], px, 159.0, C[k], 1.1)
 ax.add_patch(Rectangle((417.5, 153.5), 20, 4.4, fc='white', ec='#111', lw=1.05, zorder=5))
@@ -444,14 +432,20 @@ wn(381.0, 170.2, '45', size=5.9)
 fuse(389, 168, 'F.CONTROL', '6A/32A 1PHASE', col=C['mag'])
 line(392.1, 168, 395, 168, '#111', 1.0)
 wn(396.4, 170.2, '46', size=5.9)
-line(395, 168, 395, 80.5, '#111', 1.0)
+line(395, 168, 395, 78.5, '#111', 1.0)
 
 # =====================================================================
 # ZONE 005 — aux contacts · R2 · Q5 supply · TIMER · N0
 # =====================================================================
 cx2 = 294.7
-line(cx2, 86, cx2, 76.0, '#111', 1.05)
-txt(cx2 - 1.2, 78.1, 'X.KWH2  11', size=5.5, ha='right', style='italic')
+line(395, 78.5, 294.7, 78.5, '#111', 1.0)
+line(294.7, 78.5, 294.7, 76.0, '#111', 1.05)
+txt(293.4, 79.2, 'X.KWH2  11', size=5.2, ha='right', style='italic')
+dot(348.2, 78.5, '#111', 0.5)
+line(348.2, 78.5, 348.2, 37, '#111', 1.0)
+dot(371, 78.5, '#111', 0.5)
+line(371, 78.5, 371, 32.6, '#111', 1.0)
+line(371, 32.6, 368.9, 32.6, '#111', 1.0)
 aux_box(cx2 - 4.8, 68.0, 'KWH2', h=8.0)
 line(cx2, 68.0, cx2, 63.5, '#111', 1.05); dot(cx2, 63.5)
 txt(cx2 + 1.3, 62.5, 'X.KWH2  12', size=5.5, style='italic')
@@ -464,9 +458,9 @@ line(sx2, 72.0, sx2, 73.7, '#111', 1.05)
 ax.plot([sx2, sx2 + 2.0], [73.7, 72.1], color='#111', lw=1.05, zorder=5)
 dot(sx2 + 2.0, 72.1, '#111', 0.45)
 txt(sx2 + 4.2, 76.4, 'S1', size=6.0, weight='bold', color=C['mag'])
-line(sx2, 72.0, sx2, 67.0, '#111', 1.05)
-wn(sx2 + 1.3, 67.6, '24', size=5.5)
-sz(sx2 + 6.2, 69.8, '1*1.5mm²', rot=90, size=5.4)
+line(sx2, 72.0, sx2, 11.3, '#111', 1.05)
+dot(sx2, 11.3, '#111', 0.5)
+wn(sx2 + 1.4, 63.8, '24', size=5.2)
 # R2 coil
 ax.add_patch(Rectangle((322, 62.0), 15, 11, fc='white', ec='#111', lw=1.05, zorder=5))
 txt(329.5, 70.7, 'RELAY', size=5.4, ha='center'); txt(329.5, 68.2, 'R2', size=6.2, ha='center', weight='bold')
@@ -474,11 +468,13 @@ ax.add_patch(Rectangle((326.5, 63.5), 4.4, 3.4, fc='white', ec='#111', lw=0.9, z
 ax.plot([326.5, 330.9], [63.5, 66.9], color='#111', lw=0.9, zorder=6)
 wn(332.2, 68.2, 'A1', size=5.2, ha='left')
 wn(332.2, 64.2, 'A2', size=5.2, ha='left')
-line(sx2, 67.0, 319, 67.0, '#111', 1.05)
-line(319, 67.0, 319, 68.2, '#111', 1.05)
-line(319, 68.2, 326.5, 68.2, '#111', 1.05)
-line(329, 63.5, 329, 11.3, '#111', 1.05)
-dot(329, 11.3, '#111', 0.5)
+line(319, 46.4, 319, 54.5, '#111', 1.0)
+line(319, 54.5, 341, 54.5, '#111', 1.0)
+line(341, 54.5, 341, 68.2, '#111', 1.0)
+line(341, 68.2, 337.4, 68.2, '#111', 1.0)
+line(337.4, 64.2, 344, 64.2, '#111', 1.0)
+line(344, 64.2, 344, 11.3, '#111', 1.0)
+dot(344, 11.3, '#111', 0.5)
 # N0 rail (shared line: coil A2 and Q5 P2 drop onto it)
 line(290, 11.3, 348.2, 11.3, '#111', 1.05)
 arrL(290, 286.2, 11.3, '#111')
@@ -506,10 +502,7 @@ wn(365.2, 38.9, '14', size=5.4)
 poly([(368, 19.0), (374.5, 19.0), (374.5, 52.5), (362, 52.5)], '#111', 1.0)
 line(362, 52.5, 362, 51.2, '#111', 1.0)
 dot(362, 52.5, '#111', 0.55)
-line(368.9, Q5y + Q5h - 4.4, 381.5, Q5y + Q5h - 4.4)
-line(381.5, Q5y + Q5h - 4.4, 381.5, 72.5)
-line(381.5, 72.5, 395, 72.5)
-dot(395, 72.5, '#111', 0.6)
+
 # TIMER
 Txx, Txy, TTw, TTh = 286, 18, 44, 28
 ax.add_patch(Rectangle((Txx, Txy), TTw, TTh, fc='#f7f7f7', ec='#111', lw=1.3, zorder=5))
