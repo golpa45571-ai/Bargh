@@ -128,11 +128,12 @@ def aux_box(x, y, name, w=9.5, h=8.5, t1='13', t2='14'):
     txt(xm + 1.9, y + 1.7, t2, size=5.4)
     return xm
 
-def meter(x, y, w, h, title, left_terms, right_terms=None, right_names=None):
+def meter(x, y, w, h, title, left_terms, right_terms=None, right_names=None,
+          ys_left=None, ys_right=None):
     ax.add_patch(Rectangle((x, y), w, h, fc='#f4fdff', ec=C['cyanec'], lw=1.2, zorder=4))
     txt(x + w / 2, y + h + 1.7, title, size=7.2, ha='center', weight='bold', color='#0a7fae', bbox=True)
     n = len(left_terms)
-    ys = [y + h - 2.5 - i * ((h - 5.0) / (n - 1)) for i in range(n)]
+    ys = ys_left if ys_left else [y + h - 2.5 - i * ((h - 5.0) / (n - 1)) for i in range(n)]
     for i, lab in enumerate(left_terms):
         term(x, ys[i], '#333', 0.7)
         txt(x + 1.35, ys[i] + 0.62, lab, size=5.4)
@@ -140,7 +141,7 @@ def meter(x, y, w, h, title, left_terms, right_terms=None, right_names=None):
     yr = None
     if right_terms:
         m = len(right_terms)
-        yr = [y + h - 2.5 - i * ((h - 5.0) / (m - 1)) for i in range(m)]
+        yr = ys_right if ys_right else [y + h - 2.5 - i * ((h - 5.0) / (m - 1)) for i in range(m)]
         for i, (lab, cc) in enumerate(right_terms):
             term(x + w, yr[i], '#333', 0.7)
             if cc:
@@ -170,7 +171,7 @@ for k in ['R', 'S', 'T', 'N', 'E']:
 for nm, k in [('L1', 'R'), ('L2', 'S'), ('L3', 'T'), ('N', 'N'), ('PE', 'E')]:
     txt(14.4, by[k], nm, size=7.5, ha='right', weight='bold', style='italic')
     sz(24, by[k] + 1.35, '25*5Mm² CU', size=6.9)
-txt(16, 198.6, 'INCOMING SUPPLY — main five-conductor bus (as drawn in the master)', size=6.5,
+txt(150, 198.6, 'INCOMING SUPPLY — main five-conductor bus (as drawn in the master)', size=6.5,
     weight='bold', color='#234', style='italic')
 
 # =====================================================================
@@ -183,61 +184,73 @@ for k in ['R', 'S', 'T', 'N', 'E']:
     line(DX[k], by[k], DX[k], 82, C[k], 1.4)
     txt(DX[k] + 1.5, 83.4, {'R': 'R', 'S': 'S', 'T': 'T', 'N': 'N', 'E': 'E'}[k], size=6.2,
         color=C['green2'], weight='bold', bbox=True)
-DLY, DLRY = meter(128, 145, 34, 27.5, 'DATA LOGGER',
-                  ['I1+', 'I1-', 'I2+', 'I2-', 'I3+', 'I3-'],
-                  right_terms=[('23', C['cyan']), ('24', C['red2']), ('25', C['N']),
-                               ('26', C['R']), ('27', C['S']), ('28', C['T'])],
-                  right_names=['', '', 'N', 'L1', 'L2', 'L3'])
-txt(126.4, 158.75, 'POWER SUPPLY', size=5.1, rot=90, ha='center', color='#345')
-def ct_bank(cts, mx, mys, chan, nums, lab_mode='chan'):
+def ct_bank(cts, mx, mys, nums, lab_x):
     for i, (nm, dxx, cty) in enumerate(cts):
         ct_sym(dxx, cty, nm, lab_on_left=(i % 2 == 0))
         for j in (0, 1):
             k = i * 2 + j
-            yy = cty + (1.4 if j == 0 else -2.0)
-            poly([(dxx + 2.7, yy), (chan, yy), (chan, mys[k]), (mx - 0.8, mys[k])], '#111', 1.0)
-            if lab_mode == 'chan':
-                wn(chan + 4.2, mys[k] + 1.15, str(nums[k]), size=6.1)
-                sz(chan + 8.2, mys[k] + 1.15, '1*2.5 mm²', size=5.9)
-            else:
-                wn(dxx + 3.4, yy + 1.05, str(nums[k]), size=5.8)
-                sz(dxx + 5.4, yy + 1.05, '1*2.5 mm²', size=5.2)
-ct_bank([('CT1', 52, 168), ('CT2', 60, 162.5), ('CT3', 68, 157)], 128, DLY, 100,
-        [17, 18, 19, 20, 21, 22])
-K1Y, K1RY = meter(128, 111, 34, 27.5, 'KWH1',
-                  ['I1+', 'I1-', 'I2+', 'I2-', 'I3+', 'I3-'],
-                  right_terms=[('29', C['N']), ('30', C['R']), ('31', C['S']),
-                               ('32', C['T']), ('33', None), ('34', None)],
-                  right_names=['N', 'L1', 'L2', 'L3', '', ''])
-ct_bank([('CT4', 52, 138), ('CT5', 60, 132.5), ('CT6', 68, 127)], 128, K1Y, 100,
-        [11, 12, 13, 14, 15, 16])
+            yy = mys[k]
+            line(dxx + 2.7, yy, mx - 0.8, yy, '#111', 1.0)
+            wn(lab_x, yy + 1.0, str(nums[k]), size=5.8)
+            sz(lab_x + 2.4, yy + 1.0, '1*2.5 mm²', size=5.2)
+
+DLY, _ = meter(128, 145, 34, 27.5, 'DATA LOGGER', ['I1+', 'I1-', 'I2+', 'I2-', 'I3+', 'I3-'],
+               ys_left=[169.3, 166.5, 164.5, 161.7, 159.7, 156.9])
+txt(126.4, 158.75, 'POWER SUPPLY', size=5.1, rot=90, ha='center', color='#345')
+ct_bank([('CT1', 52, 167.9), ('CT2', 60, 163.1), ('CT3', 68, 158.3)], 128,
+        DLY, [17, 18, 19, 20, 21, 22], 76)
+K1Y, _ = meter(128, 112, 34, 30, 'KWH1', ['I1+', 'I1-', 'I2+', 'I2-', 'I3+', 'I3-'],
+               ys_left=[139.3, 136.5, 134.5, 131.7, 129.7, 126.9])
+ct_bank([('CT4', 52, 137.9), ('CT5', 60, 133.1), ('CT6', 68, 128.3)], 128,
+        K1Y, [11, 12, 13, 14, 15, 16], 76)
 mccb(52, 97, 3, 8, motor=True, cphase=[C['R'], C['S'], C['T']])
 txt(41.5, 101.5, 'Q0', size=7.6, ha='right', weight='bold')
 txt(41.5, 98.9, 'MCCB WITH MOTOR', size=6.1, ha='right')
 txt(41.5, 96.4, '3 PHASE 250A', size=6.1, ha='right')
 for i, k in enumerate(['R', 'S', 'T']):
     sz(DX[k] + 4.6, 90, '25*5Mm² CU', rot=90, size=6.2, bbox=True)
-# F.KWH1&SIG
+# ---- F.KWH1&SIG 6A 3PHASE Type:C (breakers below bus, feeds meter voltage taps) ----
 FXx = [216, 223.5, 231]
 for i, k in enumerate(['R', 'S', 'T']):
     tapdot(FXx[i], by[k], C[k])
-    line(FXx[i], by[k], FXx[i], 159.0, C[k], 1.2)
-    wn(FXx[i] + 1.0, 156.0, str(35 + i), size=6.0)
-    sz(FXx[i] - 1.7, 172, '1*1.5mm²', rot=90, size=5.7, bbox=True)
-ax.plot([FXx[0] - 2.3, FXx[2] + 2.3], [157.2, 157.2], color=C['mag'], lw=1.9, zorder=5)
+    line(FXx[i], by[k], FXx[i], 183.2, C[k], 1.2)
+    sz(FXx[i] - 1.6, 190.6, '1*1.5mm²', rot=90, size=5.6, bbox=True)
+ax.plot([FXx[0] - 2.3, FXx[2] + 2.3], [181.6, 181.6], color=C['mag'], lw=1.9, zorder=5)
 for px in FXx:
-    term(px, 158.2, C['mag'], 0.55); term(px, 156.1, C['mag'], 0.55)
-    line(px, 156.1, px, 118.6, '#111', 1.1)
+    term(px, 182.7, C['mag'], 0.55); term(px, 180.5, C['mag'], 0.55)
 for i, px in enumerate(FXx):
-    wn(px + 1.0, 152.5, str(38 + i), size=6.0)
-txt(241.4, 166.0, 'F.KWH1&SIG', size=6.8, weight='bold')
-txt(241.4, 163.5, '6A 3PHASE', size=6.0)
-txt(241.4, 161.1, 'Type:C', size=6.0)
+    wn(px + 1.0, 185.2, str(35 + i), size=5.9)
+    line(px, 180.5, px, 118.5, '#111', 1.1)
+    wn(px + 1.0, 177.0, str(38 + i), size=5.9)
+    sz(px - 1.7, 132, '1*2.5mm²', rot=90, size=5.4, bbox=True)
+txt(246.5, 166.6, 'F.KWH1&SIG', size=6.6, weight='bold')
+txt(246.5, 164.1, '6A 3PHASE', size=5.9)
+txt(246.5, 161.7, 'Type:C', size=5.9)
 tapdot(238, by['N'], C['N'])
-line(238, by['N'], 238, 118.6, C['gray'], 0.9)
-wn(239.3, 152.5, '41', size=5.9)
-for i, px in enumerate(FXx):
-    sz(px - 2.2, 128, '1*1.5mm²', rot=90, size=5.4, bbox=True)
+line(238, by['N'], 238, 118.5, C['gray'], 0.9)
+wn(239.6, 172.6, '41', size=5.7)
+# meter voltage taps -> land on the F.KWH1&SIG output drops (junction dots, per master)
+def _taprow(mx, yy, num, fx, cc, nm=None):
+    term(mx, yy, '#333', 0.7)
+    if nm: txt(mx - 2.2, yy + 0.8, nm, size=4.8, ha='right', color='#345')
+    wn(mx + 1.6, yy + 1.15, num, size=5.7)
+    if fx:
+        line(mx + 0.7, yy, fx, yy, cc, 1.0)
+        dot(fx, yy, cc, 0.62)
+    else:
+        line(mx + 0.7, yy, mx + 6.4, yy, cc, 1.0)
+        dot(mx + 6.4, yy, cc, 0.6)
+for yy, num, cc, nm in [(170, '23', C['cyan'], None), (165.5, '24', C['red2'], None)]:
+    _taprow(162, yy, num, None, cc, nm)
+for yy, num, fx, cc, nm in [(161, '25', 238, C['N'], 'N'), (156.5, '26', 216, C['R'], 'L1'),
+                            (152, '27', 223.5, C['S'], 'L2'), (147.5, '28', 231, C['T'], 'L3')]:
+    _taprow(162, yy, num, fx, cc, nm)
+for yy, num, fx, cc, nm in [(140, '29', 238, C['N'], 'N'), (135.5, '30', 216, C['R'], 'L1'),
+                            (131, '31', 223.5, C['S'], 'L2'), (126.5, '32', 231, C['T'], 'L3')]:
+    _taprow(162, yy, num, fx, cc, nm)
+term(162, 122, '#333', 0.7); wn(163.6, 123.1, '33', size=5.7)
+line(162.7, 122, 167.5, 122, '#777', 0.8); dot(167.5, 122, '#777', 0.5)
+term(162, 117.5, '#333', 0.7); wn(163.6, 117.5, '34', size=5.7)
 SBx, SBy, SBw, SBh = 209, 104, 34, 14.5
 ax.add_patch(Rectangle((SBx, SBy), SBw, SBh, fc='white', ec=C['cyanec'], lw=1.15, zorder=4))
 for i, px in enumerate(FXx):
@@ -379,33 +392,35 @@ for j in range(3):
     wn(qx[j] + 1.1, 150.4, str(47 + j), size=5.9)
     sz(qx[j] - 2.0, 147.3, '1*2.5mm²', rot=90, size=5.5, bbox=True)
 for j, k in enumerate(['R', 'S', 'T']):
-    line(qx[j], 127.5, qx[j], 119.5, C[k], 1.4)
-    if j < 2:
-        wn(qx[j] + 1.0, 130.5, str(50 + j), size=5.9)
-    else:
-        wn(qx[j] - 1.0, 130.5, '52', size=5.9, ha='right')
+    line(qx[j], 129.5, qx[j], 124.0, C[k], 1.4)
+    wn(qx[j] + 1.1, 124.9, str(50 + j), size=5.9)
 line(404, by['E'], 404, 112, C['gray'], 0.9); tapdot(404, by['E'], C['E'], 0.7)
 line(407.5, by['E'], 407.5, 112, C['gray'], 0.9); tapdot(407.5, by['E'], C['E'], 0.7)
 txt(402.9, 112.3, '53', size=5.5, color='#667', ha='right', bbox=True)
 txt(406.4, 112.3, '54', size=5.5, color='#667', ha='right', bbox=True)
 arrD(404, 112, 108.5, C['gray']); arrD(407.5, 112, 108.5, C['gray'])
-K2Y, _ = meter(414, 106, 30, 27.5, 'KWH2',
-                  ['I1+', 'I1-', 'I2+', 'I2-', 'I3+', 'I3-'])
-K2RY = [131.0, 123.5, 116.0, 108.5]
-for i, (nm, dxx, cty) in enumerate([('CT7', 386, 113.5), ('CT8', 392, 108), ('CT9', 398, 102.5)]):
-    ct_sym(dxx, cty, nm, lab_on_left=(i % 2 == 0))
+K2Y, _ = meter(414, 100, 30, 34, 'KWH2', ['I1+', 'I1-', 'I2+', 'I2-', 'I3+', 'I3-'],
+               ys_left=[131.5, 125.7, 119.9, 114.1, 108.3, 102.5])
+K2RY = [131.5, 125.7, 119.9, 114.1]
+for i, (nm, dxx, cty) in enumerate([('CT7', 386, 128.6), ('CT8', 392, 117.8), ('CT9', 398, 107)]):
+    for xx in (dxx - 2.6, dxx + 1.1):
+        ax.add_patch(Rectangle((xx, cty - 1.9), 1.5, 3.8, color=C['ct'], zorder=5))
+    txt(374.2, cty, nm, size=5.2, weight='bold')
+    txt(dxx - 3.2, cty + 0.4, 'P1', size=4.4, ha='right')
+    txt(dxx - 3.2, cty - 2.0, 'P2', size=4.4, ha='right')
     for j in (0, 1):
         k = i * 2 + j
-        yy = cty + (1.3 if j == 0 else -1.9)
-        poly([(dxx + 2.7, yy), (408, yy), (408, K2Y[k]), (413.2, K2Y[k])], '#111', 0.95)
-        wn(401.6, K2Y[k] + 1.05, str(55 + k), size=5.7)
-        sz(404.9, K2Y[k] + 1.05, '1*2.5 mm²', size=5.1)
+        yy = K2Y[k]
+        line(dxx + 2.7, yy, 413.2, yy, '#111', 0.95)
+        wn(399.4, yy + 1.0, str(55 + k), size=5.5)
+        sz(401.6, yy + 1.0, '1*2.5 mm²', size=4.9)
+txt(374.2, 113.0, '400/5A · SVA', size=5.0, bbox=True)
 for i, (num, tag) in enumerate([('61', 'I3+'), ('62', 'I3-')]):
     px = 419 + i * 7
-    poly([(px, 106), (px, 103.5)], '#111', 1.0)
-    arrD(px, 103.5, 99.8, '#111')
-    wn(px + 1.1, 101.6, num, size=5.5)
-    txt(px + 3.8, 101.6, tag, size=5.0)
+    poly([(px, 100), (px, 97.5)], '#111', 1.0)
+    arrD(px, 97.5, 93.8, '#111')
+    wn(px + 1.1, 95.6, num, size=5.5)
+    txt(px + 3.8, 95.6, tag, size=5.0)
 for j, (px, k) in enumerate([(420, 'R'), (427, 'S'), (434, 'T')]):
     tapdot(px, by[k], C[k]); line(px, by[k], px, 159.0, C[k], 1.1)
 ax.add_patch(Rectangle((417.5, 153.5), 20, 4.4, fc='white', ec='#111', lw=1.05, zorder=5))
@@ -430,11 +445,11 @@ sz(448.6, 140, '1*2.5mm²', rot=90, size=5.1)
 tapdot(380, by['N'], C['N']); poly([(380, by['N']), (380, 168), (383.5, 168)], '#111', 1.0)
 wn(381.0, 170.2, '45', size=5.9)
 fuse(389, 168, 'F.CONTROL', '6A/32A 1PHASE', col=C['mag'])
-line(392.1, 168, 394, 168, '#111', 1.0)
-wn(395.4, 170.2, '46', size=5.9)
-line(394, 168, 394, 80.5, '#111', 1.0)
-arrD(394, 84.0, 80.8, '#111')
-note(395.4, 83.0, '46 → 005', size=5.0)
+line(392.1, 168, 395, 168, '#111', 1.0)
+wn(396.4, 170.2, '46', size=5.9)
+line(395, 168, 395, 80.5, '#111', 1.0)
+arrD(395, 84.0, 80.8, '#111')
+note(396.4, 83.0, '46 → 005', size=5.0)
 
 # =====================================================================
 # ZONE 005 — aux contacts · R2 · Q5 supply · TIMER · N0
@@ -561,7 +576,8 @@ for i, (cx, bk, ey) in enumerate(zip(colx, ['R', 'S', 'T'], [80, 77.5, 75])):
         txt(px - 0.9, 40.5, str(num), size=5.3, ha='right', color=C['mag'], weight='bold', bbox=True)
         txt(px - 0.9, 37.6, lab, size=5.4, ha='right', color=C['green2'], weight='bold', bbox=True)
         sz(px - 2.4, 26, '1*2.5mm²', rot=90, size=5.0)
-        arrD(px, 14.0, 11.0, cc)
+        dot(px, 14.4, cc, 0.55)
+        arrD(px, 14.0, 11.2, cc)
         txt(px, 12.4, '148', size=5.2, ha='center', color=C['mag'], weight='bold', bbox=True)
 ncx = 452
 tapdot(ncx, by['N'], C['N'], 0.7)
