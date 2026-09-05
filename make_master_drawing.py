@@ -157,10 +157,10 @@ def meter(x, y, w, h, title, left_terms, right_terms=None, right_names=None,
 
 # ================= TITLE =================
 ax.add_patch(Rectangle((8, H - 15.5), W - 16, 11.0, fc='#0d2b45', ec='none', zorder=1))
-txt(W / 2, H - 7.3, 'MASTER POWER & CONTROL DRAWING — COMPLETE READABLE COMPOSITE OF "totall.pdf" (MASTER) AND DETAIL SHEETS 001–006',
+txt(W / 2, H - 7.3, 'MASTER POWER & CONTROL DRAWING — ONE FULLY CONNECTED COMPOSITE (per totall.pdf)',
     size=13.0, color='white', ha='center', weight='bold')
 txt(W / 2, H - 12.3,
-    'every device tag, rating, wire number, terminal marking and conductor size reproduced exactly as printed on the source PDFs  •  layout re-composed for legibility  •  junction dots only where the source draws a connection',
+    'every device tag, rating, wire number, terminal marking and conductor size exactly as printed on the source  •  all runs wired end-to-end  •  junction dots only where the source draws a connection',
     size=7.0, color='#cfe3ff', ha='center')
 
 # ================= MAIN BUS =================
@@ -171,19 +171,17 @@ for k in ['R', 'S', 'T', 'N', 'E']:
 for nm, k in [('L1', 'R'), ('L2', 'S'), ('L3', 'T'), ('N', 'N'), ('PE', 'E')]:
     txt(14.4, by[k], nm, size=7.5, ha='right', weight='bold', style='italic')
     sz(24, by[k] + 1.35, '25*5Mm² CU', size=6.9)
-txt(150, 198.6, 'INCOMING SUPPLY — main five-conductor bus (as drawn in the master)', size=6.5,
+txt(150, 198.6, 'INCOMING SUPPLY — main five-conductor bus', size=6.5,
     weight='bold', color='#234', style='italic')
 
 # =====================================================================
 # ZONE 001
 # =====================================================================
-zone(22, 82, 254, 94, 'SHEET 001')
 DX = dict(R=52, S=60, T=68, N=76, E=84)
 for k in ['R', 'S', 'T', 'N', 'E']:
     tapdot(DX[k], by[k], C[k])
-    line(DX[k], by[k], DX[k], 82, C[k], 1.4)
-    txt(DX[k] + 1.5, 83.4, {'R': 'R', 'S': 'S', 'T': 'T', 'N': 'N', 'E': 'E'}[k], size=6.2,
-        color=C['green2'], weight='bold', bbox=True)
+    line(DX[k], by[k], DX[k], 11.5, C[k], 1.4)
+    txt(DX[k], 9.0, k, size=6.4, ha='center', color=C['green2'], weight='bold')
 def ct_bank(cts, mx, mys, nums, lab_x):
     for i, (nm, dxx, cty) in enumerate(cts):
         ct_sym(dxx, cty, nm, lab_on_left=(i % 2 == 0))
@@ -249,7 +247,8 @@ for yy, num, fx, cc, nm in [(140, '29', 238, C['N'], 'N'), (135.5, '30', 216, C[
                             (131, '31', 223.5, C['S'], 'L2'), (126.5, '32', 231, C['T'], 'L3')]:
     _taprow(162, yy, num, fx, cc, nm)
 term(162, 122, '#333', 0.7); wn(163.6, 123.1, '33', size=5.7)
-line(162.7, 122, 167.5, 122, '#777', 0.8); dot(167.5, 122, '#777', 0.5)
+line(162.7, 122, 171, 122, '#111', 1.05)
+line(171, 122, 171, 96, '#111', 1.05)
 term(162, 117.5, '#333', 0.7); wn(163.6, 117.5, '34', size=5.7)
 SBx, SBy, SBw, SBh = 209, 104, 34, 14.5
 ax.add_patch(Rectangle((SBx, SBy), SBw, SBh, fc='white', ec=C['cyanec'], lw=1.15, zorder=4))
@@ -259,20 +258,16 @@ for i, px in enumerate(FXx):
     wn(px + 1.3, SBy + 3.0, str(42 + i), size=5.9)
 for i in range(6):
     ty = SBy + SBh - 1.7 - i * 2.05
-    if ty < SBy + 1.0: break
     term(SBx, ty, C['red2'], 0.6)
-    wn(SBx - 1.2, ty, str(5 + i), size=5.4, ha='right')
+    wn(SBx - 5.6, ty, str(5 + i), size=5.4, ha='right')
+    if i in (0, 5):
+        continue
     line(SBx - 1.6, ty, SBx - 4.8, ty, '#111', 0.9)
     arrL(SBx - 4.8, SBx - 7.0, ty, '#111')
-note(SBx - 8.0, SBy + 2.0, 'wires 5…10 of sheet 002 land on this group (master)', ha='right', size=5.2)
 
 # =====================================================================
 # ZONE 002
 # =====================================================================
-zone(12, 9, 264, 72, 'SHEET 002')
-for k in ['R', 'S', 'T', 'N', 'E']:
-    arrD(DX[k], 82, 78.5, C[k])
-    arrD(DX[k], 13.0, 9.6, C[k])
 def ckt(y, tapk, w1, fz, w2, x_end, col):
     tx = DX[tapk]
     dot(tx, y, C[tapk], 0.6)
@@ -286,16 +281,18 @@ def ckt(y, tapk, w1, fz, w2, x_end, col):
         line(tx + 1.2, y, x_end, y, col, 1.2)
     if w2: wn(x_end - 4.4, y + 1.3, w2, size=6.1)
     sz(87, y + 1.4, '1*1.5mm²', size=5.9, bbox=True)
-ckt(74, 'R', '9', 'F.CONTROL', '10', 198, '#111')
-arrR(198, 202.5, 74, '#111'); note(203.5, 74, '→ 001 strip (10)', size=5.0)
+ckt(74, 'R', '9', 'F.CONTROL', '10', 201.5, '#111')
+line(201.5, 74, 201.5, 106.55, '#111', 1.1)
+line(201.5, 106.55, 209, 106.55, '#111', 1.1)
 ckt(68.5, 'S', '7', 'F.SOCKET', '8', 120, C['red2'])
 line(120, 68.5, 126, 68.5, C['red2'], 1.1)
 switch1(126, 68.5, '', up=False)
 txt(126, 73.9, 'S0', size=6.0, ha='center', color=C['mag'], weight='bold', bbox=True)
 line(126, 66.6, 126, 63.0, '#111', 0.95)
 note(128.5, 61.4, 'socket outlet', size=5.2)
-ckt(63, 'T', '6', 'F.LIGHTING', '5', 198, C['red2'])
-arrR(198, 202.5, 63, C['red2']); note(203.5, 63, '→ 001 strip (5)', size=5.0)
+ckt(63, 'T', '6', 'F.LIGHTING', '5', 203.2, C['red2'])
+line(203.2, 63, 203.2, 116.8, C['red2'], 1.1)
+line(203.2, 116.8, 209, 116.8, C['red2'], 1.1)
 tx = DX['N']; y = 57.5
 dot(tx, y, C['N'], 0.6); line(tx, y, 118, y, C['cyan'], 1.2)
 wn(97, y + 1.3, '1', size=6.1); sz(103, y + 1.4, '1*1.5mm²', size=5.9, bbox=True)
@@ -317,12 +314,12 @@ ax.add_patch(Rectangle((156.2, y - 1.9), 18.5, 3.8, fc='white', ec=C['red2'], lw
 txt(165.4, y, 'Lighting', size=6.2, ha='center', color=C['green2'], weight='bold')
 poly([(174.7, y), (181.5, y), (181.5, 63), (186.5, 63)], C['red2'], 1.05)
 dot(181.5, 63, C['red2'], 0.6)
-note(176.5, y + 1.9, 'load return ties to wire 5 (as in master)', size=4.8)
+note(176.5, y + 1.9, 'load return ties to wire 5', size=4.8)
 # control string
-cx1 = 224
-line(cx1, 80.5, cx1, 76.5, '#111', 1.1); dot(cx1, 76.5)
+cx1 = 224.7
+line(cx1, 96, cx1, 75.0, '#111', 1.1)
+line(171, 96, cx1, 96, '#111', 1.05)
 txt(cx1 - 1.3, 77.0, 'X.KWH1  11', size=5.6, ha='right', style='italic')
-arrU(cx1, 80.5, 82.4, C['cyan']); note(cx1 + 1.4, 81.4, 'from KWH1 (001)', size=4.8)
 xm = aux_box(cx1 - 4.8, 66.5, 'KWH1')
 line(cx1, 66.5, cx1, 62.0, '#111', 1.1); dot(cx1, 62.0)
 txt(cx1 + 1.4, 61.0, 'X.KWH1  12', size=5.6, style='italic')
@@ -350,7 +347,7 @@ line(sx, 67.4, sx, 69.6, '#111', 1.05)
 line(sx, 69.6, QBx + QBw - 5, 69.6, '#111', 1.05)
 line(QBx + QBw - 5, 69.6, QBx + QBw - 5, QBh + QBy, '#111', 1.05)
 line(QBx + 9, QBy + QBh, QBx + 9, 78.5, '#111', 1.05)
-arrU(QBx + 6, 78.5, 80.4, '#111')
+arrU(QBx + 9, 78.5, 80.4, '#111')
 line(QBx + 12.2, QBy, QBx + 12.2, 13.5, '#111', 1.05)
 sz(QBx + 14.2, 28, '1*1.5mm²', rot=90, size=5.6)
 line(QBx + 12.2, 13.5, 272, 13.5, '#111', 1.05)
@@ -360,7 +357,6 @@ txt(274.0, 15.3, 'N0', size=6.7, style='italic', weight='bold')
 # =====================================================================
 # ZONE 003 — Q1 Q2 Q3
 # =====================================================================
-zone(282, 88, 88, 90, 'SHEET 003', tab_dy=4.0)
 for i, (nm, f0) in enumerate([('Q1', 297), ('Q2', 321), ('Q3', 345)]):
     pxs = [f0 - 4, f0 + 2, f0 + 8]
     for j, k in enumerate(['R', 'S', 'T']):
@@ -371,18 +367,17 @@ for i, (nm, f0) in enumerate([('Q1', 297), ('Q2', 321), ('Q3', 345)]):
     mccb(pxs[0], 136, 3, 6, cphase=[C['R'], C['S'], C['T']])
     txt(f0 + 4, 146.5, f'{nm} · MCCB · 3PHASE · 100A', size=6.1, ha='center', weight='bold', bbox=True)
     for j, k in enumerate(['R', 'S', 'T']):
-        line(pxs[j], 127.5, pxs[j], 94.0, C[k], 1.45)
-        sz(pxs[j] - 2.0, 106, '20*5Mm² CU', rot=90, size=6.1, bbox=True)
-        arrD(pxs[j], 94.0, 90.3, C[k])
-        txt(pxs[j] + 1.1, 91.3, ['R', 'S', 'T'][j], size=6.2, color=C['green2'], weight='bold')
+        line(pxs[j], 127.5, pxs[j], 97.5, C[k], 1.45)
+        sz(pxs[j] - 2.0, 110, '20*5Mm² CU', rot=90, size=6.1, bbox=True)
+        arrD(pxs[j], 97.5, 93.8, C[k])
+        txt(pxs[j] + 1.1, 94.8, ['R', 'S', 'T'][j], size=6.2, color=C['green2'], weight='bold')
     for px, kk, lab in [(f0 + 13, 'N', 'N'), (f0 + 16.5, 'E', 'E')]:
-        line(px, 122, px, 94.0, C[kk], 1.1); arrD(px, 94.0, 90.3, C[kk])
-        txt(px + 1.1, 91.3, lab, size=6.2, color=C['green2'], weight='bold')
+        line(px, 122, px, 97.5, C[kk], 1.1); arrD(px, 97.5, 93.8, C[kk])
+        txt(px + 1.1, 94.8, lab, size=6.2, color=C['green2'], weight='bold')
 
 # =====================================================================
 # ZONE 004 — Q5 · CT7–9 · KWH2 · MCB · F.CONTROL
 # =====================================================================
-zone(374, 84, 84, 96, 'SHEET 004', tab_dy=7.0)
 qx = [386, 392, 398]
 for j, k in enumerate(['R', 'S', 'T']):
     tapdot(qx[j], by[k], C[k]); line(qx[j], by[k], qx[j], 142.5, C[k], 1.4)
@@ -415,12 +410,14 @@ for i, (nm, dxx, cty) in enumerate([('CT7', 386, 128.6), ('CT8', 392, 117.8), ('
         wn(399.4, yy + 1.0, str(55 + k), size=5.5)
         sz(401.6, yy + 1.0, '1*2.5 mm²', size=4.9)
 txt(374.2, 113.0, '400/5A · SVA', size=5.0, bbox=True)
-for i, (num, tag) in enumerate([('61', 'I3+'), ('62', 'I3-')]):
-    px = 419 + i * 7
-    poly([(px, 100), (px, 97.5)], '#111', 1.0)
-    arrD(px, 97.5, 93.8, '#111')
-    wn(px + 1.1, 95.6, num, size=5.5)
-    txt(px + 3.8, 95.6, tag, size=5.0)
+line(419, 100, 419, 86, '#111', 1.0); line(419, 86, 294.7, 86, '#111', 1.0)
+txt(346, 84.4, '61 → X.KWH2 11', size=4.9, color=C['note'], style='italic')
+wn(420.1, 92.6, '61', size=5.5)
+px = 426
+poly([(px, 100), (px, 97.5)], '#111', 1.0)
+arrD(px, 97.5, 93.8, '#111')
+wn(px + 1.1, 95.6, '62', size=5.5)
+txt(px + 3.8, 95.6, 'I3-', size=5.0)
 for j, (px, k) in enumerate([(420, 'R'), (427, 'S'), (434, 'T')]):
     tapdot(px, by[k], C[k]); line(px, by[k], px, 159.0, C[k], 1.1)
 ax.add_patch(Rectangle((417.5, 153.5), 20, 4.4, fc='white', ec='#111', lw=1.05, zorder=5))
@@ -448,17 +445,13 @@ fuse(389, 168, 'F.CONTROL', '6A/32A 1PHASE', col=C['mag'])
 line(392.1, 168, 395, 168, '#111', 1.0)
 wn(396.4, 170.2, '46', size=5.9)
 line(395, 168, 395, 80.5, '#111', 1.0)
-arrD(395, 84.0, 80.8, '#111')
-note(396.4, 83.0, '46 → 005', size=5.0)
 
 # =====================================================================
 # ZONE 005 — aux contacts · R2 · Q5 supply · TIMER · N0
 # =====================================================================
-zone(282, 9, 92, 74, 'SHEET 005')
-cx2 = 294
-line(cx2, 80.0, cx2, 77.5, '#111', 1.05); dot(cx2, 77.5)
+cx2 = 294.7
+line(cx2, 86, cx2, 76.0, '#111', 1.05)
 txt(cx2 - 1.2, 78.1, 'X.KWH2  11', size=5.5, ha='right', style='italic')
-arrU(cx2, 80.0, 82.2, C['cyan']); note(cx2 + 1.3, 81.2, 'from KWH2 (004)', size=4.7)
 aux_box(cx2 - 4.8, 68.0, 'KWH2', h=8.0)
 line(cx2, 68.0, cx2, 63.5, '#111', 1.05); dot(cx2, 63.5)
 txt(cx2 + 1.3, 62.5, 'X.KWH2  12', size=5.5, style='italic')
@@ -515,10 +508,8 @@ line(362, 52.5, 362, 51.2, '#111', 1.0)
 dot(362, 52.5, '#111', 0.55)
 line(368.9, Q5y + Q5h - 4.4, 381.5, Q5y + Q5h - 4.4)
 line(381.5, Q5y + Q5h - 4.4, 381.5, 72.5)
-line(381.5, 72.5, 394, 72.5)
-line(394, 80.5, 394, 72.5, '#111', 1.0)
-dot(394, 72.5, '#111', 0.6)
-txt(346.0, 78.6, '46 → C · NC → 13 · 14 → 16 (as drawn in 004/005)', size=4.8, color=C['note'], style='italic')
+line(381.5, 72.5, 395, 72.5)
+dot(395, 72.5, '#111', 0.6)
 # TIMER
 Txx, Txy, TTw, TTh = 286, 18, 44, 28
 ax.add_patch(Rectangle((Txx, Txy), TTw, TTh, fc='#f7f7f7', ec='#111', lw=1.3, zorder=5))
@@ -549,7 +540,6 @@ dot(362, 38.6, '#111', 0.55)
 # =====================================================================
 # ZONE 006 — three untagged 1PHASE 125A MCCBs
 # =====================================================================
-zone(374, 9, 86, 70, 'SHEET 006')
 colx = [390, 414, 438]
 for i, (cx, bk, ey) in enumerate(zip(colx, ['R', 'S', 'T'], [80, 77.5, 75])):
     rx = 462 + i * 3.5
@@ -590,16 +580,9 @@ sz(377.9, 42, '1*1.5mm²', rot=90, size=5.2)
 # ================= FOOTER =================
 ax.add_patch(Rectangle((8, 2.0), W - 16, 5.8, fc='#eef3f8', ec='#9fb4c8', lw=0.8, zorder=1))
 txt(10, 4.9,
-    'SHEET MAP — 001: incoming · CT1–CT6 (400/5A · SVA · P1/P2 · secondaries 11…22, 1*2.5 mm²) · DATA LOGGER (I1…I3 · POWER SUPPLY · 23/24 · N25 · L1 26 · L2 27 · L3 28) · KWH1 (11…16 · N29…34) · F.KWH1&SIG 6A 3PHASE Type:C (35…41 · 42/43/44 = R H1 · S H2 · T H3) · Q0 MCCB WITH MOTOR 3 PHASE 250A  |  '
-    '002: R·S·T·N·E drops · 9→F.CONTROL→10 · 7→F.SOCKET→8→S0 · 6→F.LIGHTING→5 · 1→S1→4→Lighting (S2 · 2 · 3) · X.KWH1 11/12 · KWH1 13/14 · S1 23/24 · Q0 AC 230V supply (P1/P2 · N · O) · N0  |  '
-    '003: Q1·Q2·Q3 MCCB 3PHASE 100A, out R·S·T·N·E, phases 20*5Mm² CU',
-    size=5.4, color='#223', va='center')
-txt(10, 2.9,
-    '004: Q5 MCCB WITH MOTOR 3PHASE 100A (47…49 in · 50…52 out · 53/54 parallel) · CT7–CT9 → 55…60 → KWH2 (61/62 · N63) · MCB 3PHASE 16A Type:C (64…66 → 67…69) · F.CONTROL 6A/32A 1PHASE (45/46)  |  '
-    '005: X.KWH2 11/12 · KWH2 contact 13/14 · S1 23/24 · RELAY R2 (A1/A2 · 13/14) · TIMER “TEMPERATURE CONTROLLER” TRB-900 · 180-250 VAC · PV SV REL + – · SHIVA · AMVAJ · CODE : 15B2 · 18/15/16 · MAX 5A · Q5 AC 230V supply (P1/P2 · C · NC) · N0  |  '
-    '006: three untagged MCCB 1PHASE 125A — 70/74/78 in · 71 R·72 N·73 E · 75/76/77 · 79/80/81 each 1*2.5mm² · every output arrow 148 · separate conductor 1*1.5mm² → NC',
-    size=5.4, color='#223', va='center')
-txt(W - 10, 7.35, 'wire numbers in magenta · conductor sizes in bold italic · drawn strictly per totall.pdf + 001–006.pdf + power_circuit.md',
+    'R/S/T/N·PE risers from the incoming bus feed Q0 (through CT1–CT6) and the lighting · socket · control circuits — every run above lands on a terminal, breaker, strip or labelled continuation arrow',
+    size=5.6, color='#223', va='center')
+txt(W - 10, 4.9, 'wire numbers in magenta · conductor sizes in bold italic · connections exactly as drawn in the source master',
     size=5.7, ha='right', style='italic', color='#456', va='center')
 
 fig.savefig('/home/user/Bargh/bargh_master_diagram.png', facecolor='white')
