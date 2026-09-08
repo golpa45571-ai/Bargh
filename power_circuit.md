@@ -198,3 +198,5 @@ A separate left-side conductor is marked `1*1.5mm²` and terminates at a point l
 ## Master-drawing reconciliation
 
 `totall.pdf` is the composite of the six detailed regions above.  It shows the same Q0/CT1–CT6, Lighting/Q0-control, Q1–Q3, Q5/CT7–CT9/KWH2/MCB, TIMER/controller/Q5-control, and three 125 A MCCB regions.  In the master, the two face labels that are separated as `SHIVA` and `AMVAJ` in `005.pdf` appear as the single rendered string `SHIVAAMVAJ`.  The master has no additional labelled component not transcribed in the six sheet sections above.
+
+In the redrawn composite (`bargh_master_diagram.png` / `bargh_master_diagram.svg`), the three 125 A MCCB line-side conductors (`70`, `74`, `78`) are fed from the Q5 load side — the `50`/`51`/`52` runs down through CT7–CT9 — and are not tapped from the main incoming bus.
