@@ -378,14 +378,20 @@ txt(375.5, 137.6, 'Q5 · MCCB WITH MOTOR · 3PHASE 100A', size=5.3, ha='left', w
 for j in range(3):
     wn(qx[j] + 1.1, 150.4, str(47 + j), size=5.9)
     sz(qx[j] - 2.0, 147.3, '1*2.5mm²', rot=90, size=5.5, bbox=True)
+# Q5 load side (50 · 51 · 52) runs on down through CT7 · CT8 · CT9 and continues to
+# ZONE 006, where it feeds the line side of the three 1PHASE 125A MCCBs.
+BANDY = [80.0, 84.0, 88.0]          # R → MCCB-1 · S → MCCB-2 · T → MCCB-3
 for j, k in enumerate(['R', 'S', 'T']):
-    line(qx[j], 129.5, qx[j], 124.0, C[k], 1.4)
+    line(qx[j], 129.5, qx[j], BANDY[j], C[k], 1.4)
     wn(qx[j] + 1.1, 124.9, str(50 + j), size=5.9)
-line(404, by['E'], 404, 112, C['gray'], 0.9); tapdot(404, by['E'], C['E'], 0.7)
-line(407.5, by['E'], 407.5, 112, C['gray'], 0.9); tapdot(407.5, by['E'], C['E'], 0.7)
-txt(402.9, 112.3, '53', size=5.5, color='#667', ha='right', bbox=True)
-txt(406.4, 112.3, '54', size=5.5, color='#667', ha='right', bbox=True)
-arrD(404, 112, 108.5, C['gray']); arrD(407.5, 112, 108.5, C['gray'])
+    sz(qx[j] - 2.0, 96.5, '1*2.5mm²', rot=90, size=5.2, bbox=True)
+# 53 (N) and 54 (E) — the neutral and earth feeders of the 125A MCCB group (ZONE 006)
+NTR, ETR = 404, 407.5
+NBY, EBY = 76.0, 72.0
+tapdot(NTR, by['N'], C['N'], 0.7); line(NTR, by['N'], NTR, NBY, C['N'], 1.05)
+tapdot(ETR, by['E'], C['E'], 0.7); line(ETR, by['E'], ETR, EBY, C['E'], 1.05)
+wn(NTR + 1.0, 96.5, '53', size=5.5)
+wn(ETR + 1.0, 92.5, '54', size=5.5)
 K2Y, _ = meter(414, 100, 30, 34, 'KWH2', ['I1+', 'I1-', 'I2+', 'I2-', 'I3+', 'I3-'],
                ys_left=[131.5, 125.7, 119.9, 114.1, 108.3, 102.5])
 K2RY = [131.5, 125.7, 119.9, 114.1]
@@ -532,16 +538,32 @@ dot(362, 38.6, '#111', 0.55)
 
 # =====================================================================
 # ZONE 006 — three untagged 1PHASE 125A MCCBs
+# Line side (70 · 74 · 78) is fed from the OUTGOING phases of Q5
+# (MCCB WITH MOTOR · 3PHASE 100A) — wires 50 · 51 · 52 after CT7–CT9 —
+# NOT from the incoming main bus.  N and E of each outgoing group come
+# from the 53 (N) and 54 (E) feeders.
 # =====================================================================
 colx = [390, 414, 438]
-for i, (cx, bk, ey) in enumerate(zip(colx, ['R', 'S', 'T'], [80, 77.5, 75])):
-    rx = 462 + i * 3.5
-    tapdot(rx, by[bk], C[bk]); line(rx, by[bk], rx, ey - 2.6 * i, C[bk], 1.1)
-    poly([(rx, ey - 2.6 * i), (cx, ey - 2.6 * i), (cx, 66.5)], C[bk], 1.1)
+PHK = ['R', 'S', 'T']
+NX = [cx + 5 for cx in colx]
+EX = [cx + 10 for cx in colx]
+# N (53) and E (54) distribution runs of the 125A group
+line(NX[0], NBY, NX[-1], NBY, C['N'], 1.1)
+line(EX[0], EBY, EX[-1], EBY, C['E'], 1.1)
+dot(NTR, NBY, C['N'], 0.6); dot(ETR, EBY, C['E'], 0.6)
+for xx in NX[:-1]: dot(xx, NBY, C['N'], 0.55)
+for xx in EX[:-1]: dot(xx, EBY, C['E'], 0.55)
+txt(484, 97.0, 'the three 1PHASE 125A MCCBs are fed from the Q5 outgoing phases', size=5.0,
+    ha='right', style='italic', color=C['note'], bbox=True)
+txt(484, 93.8, '50 · 51 · 52 (after CT7–CT9) — N · E of each group from 53 · 54', size=5.0,
+    ha='right', style='italic', color=C['note'], bbox=True)
+for i, (cx, bk) in enumerate(zip(colx, PHK)):
+    # line side: Q5 outgoing phase -> distribution run -> MCCB
+    poly([(qx[i], BANDY[i]), (cx, BANDY[i]), (cx, 66.5)], C[bk], 1.15)
     wn(cx + 1.1, 64.6, str(70 + i * 4), size=6.0)
     txt(cx - 2.4, 61.0, 'MCCB', size=6.0, ha='right', weight='bold')
     txt(cx - 2.4, 58.7, '1PHASE 125A', size=5.7, ha='right')
-    line(cx, 66.5, cx, 55.5, '#111', 1.2)
+    line(cx, 66.5, cx, 55.5, C[bk], 1.2)
     term(cx, 55.5, '#111', 0.6)
     ax.plot([cx, cx + 2.1], [55.5, 57.5], color='#111', lw=1.1, zorder=5)
     dot(cx + 2.1, 57.5, '#111', 0.5)
@@ -549,13 +571,11 @@ for i, (cx, bk, ey) in enumerate(zip(colx, ['R', 'S', 'T'], [80, 77.5, 75])):
     poly([(cx - 1.15, 50.8), (cx - 1.15, 52.0), (cx + 0.05, 52.0), (cx + 0.05, 53.1)], '#111', 0.9)
     txt(cx + 1.1, 51.6, 'I>', size=5.4, weight='bold')
     shunt(cx - 7.3, 53.3)
-    line(cx, 50.8, cx, 46.0, '#111', 1.15)
-    for j, (lab, num, cc) in enumerate([('R', 71 + i * 3, C[bk]),
-                                        ('N', 72 + i * 3, C['N']),
-                                        ('E', 73 + i * 3, C['E'])]):
-        px = cx - 4 + j * 4
-        poly([(cx, 46.0), (cx, 44.0), (px, 44.0)], '#111', 1.0)
-        line(px, 44.0, px, 14.0, cc, 1.15)
+    # load side: phase (R / S / T) · N from 53 · E from 54
+    for px, lab, num, cc, ytop in [(cx, bk, 71 + i * 4, C[bk], 50.8),
+                                   (NX[i], 'N', 72 + i * 4, C['N'], NBY),
+                                   (EX[i], 'E', 73 + i * 4, C['E'], EBY)]:
+        line(px, ytop, px, 14.0, cc, 1.15)
         txt(px - 0.9, 40.5, str(num), size=5.3, ha='right', color=C['mag'], weight='bold', bbox=True)
         txt(px - 0.9, 37.6, lab, size=5.4, ha='right', color=C['green2'], weight='bold', bbox=True)
         sz(px - 2.4, 26, '1*2.5mm²', rot=90, size=5.0)
@@ -573,7 +593,7 @@ sz(377.9, 42, '1*1.5mm²', rot=90, size=5.2)
 # ================= FOOTER =================
 ax.add_patch(Rectangle((8, 2.0), W - 16, 5.8, fc='#eef3f8', ec='#9fb4c8', lw=0.8, zorder=1))
 txt(10, 4.9,
-    'R/S/T/N·PE risers from the incoming bus feed Q0 (through CT1–CT6) and the lighting · socket · control circuits — every run above lands on a terminal, breaker, strip or labelled continuation arrow',
+    'R/S/T/N·PE risers from the incoming bus feed Q0 (through CT1–CT6), Q1–Q3, Q5 and the lighting · socket · control circuits  —  the three 1PHASE 125A MCCBs are fed from the Q5 outgoing phases 50 · 51 · 52 (after CT7–CT9), not from the main bus',
     size=5.6, color='#223', va='center')
 txt(W - 10, 4.9, 'wire numbers in magenta · conductor sizes in bold italic · connections exactly as drawn in the source master',
     size=5.7, ha='right', style='italic', color='#456', va='center')
