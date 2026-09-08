@@ -27,8 +27,8 @@ python3 make_master_drawing.py
 
 - هر فایل را در همین صفحه باز کنید و با دکمهٔ **Download raw file** (آیکون ⬇) بگیرید.
 - برای دانلود یک‌جای کل پروژه: دکمهٔ **Code → Download ZIP** در بالای همین صفحه.
-- لینک مستقیم ZIP این برنچ:
-  https://github.com/golpa45571-ai/Bargh/archive/refs/heads/arena/01a06e4b-bargh.zip
+- لینک مستقیم ZIP برنچ اصلی:
+  https://github.com/golpa45571-ai/Bargh/archive/refs/heads/main.zip
 
 ---
 

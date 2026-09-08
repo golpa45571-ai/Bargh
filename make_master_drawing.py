@@ -578,6 +578,8 @@ txt(10, 4.9,
 txt(W - 10, 4.9, 'wire numbers in magenta · conductor sizes in bold italic · connections exactly as drawn in the source master',
     size=5.7, ha='right', style='italic', color='#456', va='center')
 
-fig.savefig('/home/user/Bargh/bargh_master_diagram.png', facecolor='white')
-fig.savefig('/home/user/Bargh/bargh_master_diagram.svg', facecolor='white')
+import os
+_out = os.path.dirname(os.path.abspath(__file__))
+fig.savefig(os.path.join(_out, 'bargh_master_diagram.png'), facecolor='white')
+fig.savefig(os.path.join(_out, 'bargh_master_diagram.svg'), facecolor='white')
 print('saved')
