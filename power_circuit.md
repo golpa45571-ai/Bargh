@@ -12,7 +12,7 @@ This is a drawing-faithful transcription of `totall.pdf` and its six detail shee
 | `003.pdf` | Q1, Q2, and Q3. |
 | `004.pdf` | Q5, CT7–CT9, KWH2, `F.CONTROL`, and the 16 A MCB. |
 | `005.pdf` | TIMER/temperature-controller graphic, KWH2 auxiliary contact, S1 contact, relay R2, and Q5 control wiring. |
-| `006.pdf` | Three untagged 125 A, single-phase MCCBs. |
+| `006.pdf` | Three untagged 125 A, single-phase MCCBs, fed from the Q5 outgoing phases. |
 
 ## Complete component inventory
 
@@ -137,6 +137,12 @@ Every CT in this sheet is printed with `400/5A`, `SVA`, `P1`, and `P2`.  The fol
 | Q5 line side | `47`, `48`, `49`; each marked `1*2.5mm²` |
 | Q5 load side | `50`, `51`, `52`; the two parallel conductors beside them are numbered `53`, `54` |
 
+Wires `50`, `51`, `52` leave Q5, pass through CT7, CT8 and CT9 respectively and continue
+downwards off this sheet; on the master they run on to the line side of the three
+125 A single-phase MCCBs of `006.pdf` (see that section).  The two conductors beside
+them, `53` and `54`, are the neutral and the earth drawn down from the main bus, and they
+supply the `N` and `E` of the same three MCCB groups.
+
 ### CT7–CT9 and KWH2
 
 Every CT in this sheet is printed with `400/5A`, `SVA`, `P1`, and `P2`.
@@ -187,14 +193,43 @@ The lower two KWH2 terminals are connected to continuation arrows `61` and `62` 
 
 All three symbols are printed `MCCB` and `1PHASE 125A`; no Q reference designator is printed beside them.
 
-| Drawn MCCB | Line-side number | Load-side number and conductor marks |
-|---|---:|---|
-| First | `70` | `71 R`, `72 N`, `73 E`; each marked `1*2.5mm²`; all three output arrows carry `148` |
-| Second | `74` | `75 R`, `76 N`, `77 E`; each marked `1*2.5mm²`; all three output arrows carry `148` |
-| Third | `78` | `79 R`, `80 N`, `81 E`; each marked `1*2.5mm²`; all three output arrows carry `148` |
+**Supply of the line side.**  The line-side conductors `70`, `74` and `78` are **not** taken
+from the incoming main busbar.  Each of them is the continuation of one outgoing phase of
+Q5 (`MCCB WITH MOTOR`, `3PHASE 100A`) after its current transformer: `50` (phase `R`, after
+CT7) → `70`, `51` (phase `S`, after CT8) → `74`, `52` (phase `T`, after CT9) → `78`.
+The neutral and earth of the three load-side groups are taken from conductors `53` (N) and
+`54` (E), which run down from the main bus beside the Q5 outgoing phases; each group taps
+them with a junction dot.  Consequently the load-side phase marking of the three groups is
+`R`, `S` and `T` respectively — one single-phase 125 A MCCB per phase of Q5.
+
+| Drawn MCCB | Line-side number | Fed from | Load-side number and conductor marks |
+|---|---:|---|---|
+| First | `70` | Q5 outgoing phase `50` (`R`, after CT7) | `71 R`, `72 N`, `73 E`; each marked `1*2.5mm²`; all three output arrows carry `148` |
+| Second | `74` | Q5 outgoing phase `51` (`S`, after CT8) | `75 S`, `76 N`, `77 E`; each marked `1*2.5mm²`; all three output arrows carry `148` |
+| Third | `78` | Q5 outgoing phase `52` (`T`, after CT9) | `79 T`, `80 N`, `81 E`; each marked `1*2.5mm²`; all three output arrows carry `148` |
+
+Only the phase conductor passes through the single-pole 125 A MCCB; the `N` and `E`
+conductors of each group run straight from `53`/`54` to the outgoing arrows and are not
+switched by the breaker.
 
 A separate left-side conductor is marked `1*1.5mm²` and terminates at a point labelled `NC`.
 
 ## Master-drawing reconciliation
 
 `totall.pdf` is the composite of the six detailed regions above.  It shows the same Q0/CT1–CT6, Lighting/Q0-control, Q1–Q3, Q5/CT7–CT9/KWH2/MCB, TIMER/controller/Q5-control, and three 125 A MCCB regions.  In the master, the two face labels that are separated as `SHIVA` and `AMVAJ` in `005.pdf` appear as the single rendered string `SHIVAAMVAJ`.  The master has no additional labelled component not transcribed in the six sheet sections above.
+
+The master is also the sheet that shows how the six regions are joined: the three outgoing
+Q5 conductors `50`, `51`, `52` leave the CT7–CT9 group, turn to the right on three separate
+horizontal runs and land on the line side of the three 125 A single-phase MCCBs (`70`, `74`,
+`78`), while `53` (N) and `54` (E) run below them and are tapped by each of the three groups.
+No conductor of that group is taken from the incoming main busbar.
+
+## Corrections applied to the re-drawn master (`make_master_drawing.py`)
+
+| Item | Previously drawn | Corrected to |
+|---|---|---|
+| Line side of the three `1PHASE 125A` MCCBs | tapped directly off the incoming main busbar (R/S/T) | taken from the outgoing side of Q5 (`MCCB WITH MOTOR`, `3PHASE 100A`), wires `50`/`51`/`52` after CT7–CT9 |
+| `N` and `E` of each 125 A group | branched off the load side of the single-pole MCCB | taken from the `53` (N) and `54` (E) feeders, tapped with junction dots |
+| Wires `53` and `54` | short unconnected stubs off the PE bus | full N and E feeders from the main bus down to the 125 A group |
+| Load-side phase marking of the 2nd and 3rd group | `R`, `R` | `S`, `T` (one MCCB per Q5 phase) |
+| Load-side wire numbers | `71-72-73` / `74-75-76` / `77-78-79` | `71-72-73` / `75-76-77` / `79-80-81`, as printed on `006.pdf` |
