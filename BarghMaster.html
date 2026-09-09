@@ -15972,7 +15972,7 @@ const PROJECT = {
 const ZONES = [
   { id:'Z001', t:'ZONE 001 — اندازه‌گیری ورودی و کلید اصلی', ic:'📈',
     desc:'رایزرهای R/S/T/N/E از شینه (x=52/60/68/76/84)، CT1…CT3 → DATA LOGGER، CT4…CT6 → KWH1، کلید اصلی Q0 (MCCB WITH MOTOR 3 PHASE 250A)، کلید F.KWH1&SIG 6A 3PHASE Type:C و جعبه سیگنال R H1 · S H2 · T H3.',
-    devs:['Q0','CT1','CT2','CT3','CT4','CT5','CT6','DLOG','KWH1','F.KWH1&SIG','SIGBOX'],
+    devs:['Q0','CT1','CT2','CT3','CT4','CT5','CT6','DLY','KWH1','F.KWH1&SIG','SIGBOX'],
     wires:['11–22','23–34','35–37','38–41','42–44'], box:[40,95,190,110] },
   { id:'Z002', t:'ZONE 002 — مدارهای کمکی: کنترل · پریز · روشنایی', ic:'💡',
     desc:'سه انشعاب فیوزدار از رایزرها: F.CONTROL (سیم 9→10)، F.SOCKET (7→8 → پریز S0)، F.LIGHTING (6→5). مدار روشنایی با کلیدهای S1/S2 (سیم 1·2·3·4) و چراغ Lighting. رشته کنترل X.KWH1 11/12 و جعبه Q0 (AC 230V POWER SUPPLY + شنت) تا ریل N0.',
@@ -16021,7 +16021,7 @@ const COMPONENTS = [
 { tag:'CT6', name:'ترانس جریان فاز T → KWH1', type:'CT', cat:'اندازه‌گیری', zone:'Z001',
   spec:'400/5A · SVA', ratio:'400/5', burden:'SVA', x:68, y:128.3, w:12, h:9,
   terminals:['P1','P2','S1','S2'], wires:['15','16'], xsec:'1*2.5 mm²', src:'LABEL', note:'ct_sym(68, 128.3).' },
-{ tag:'DLOG', name:'DATA LOGGER', type:'METER', cat:'اندازه‌گیری', zone:'Z001',
+{ tag:'DLY', name:'DATA LOGGER', type:'METER', cat:'اندازه‌گیری', zone:'Z001',
   spec:'ورودی جریان I1±/I2±/I3± از CT1…CT3 — برچسب عمودی POWER SUPPLY در سمت چپ',
   x:145, y:158.75, w:34, h:27.5, terminals:['I1+','I1-','I2+','I2-','I3+','I3-','23','24','25 N','26 L1','27 L2','28 L3'],
   wires:['17','18','19','20','21','22','23','24','25','26','27','28'], xsec:'1*2.5 mm²', src:'LABEL',
@@ -16322,7 +16322,7 @@ const PYFUNCS = [
 const FAULTS = [
   {id:'F01', t:'قطع فاز R ورودی', cat:'شینه', sev:'high', target:'BUS',
    d:'حذف ولتاژ فاز L1 روی شینه 25*5Mm² CU — همه رایزرهای x=52 و درپ 38 بی‌برق می‌شوند.',
-   sym:'جریان CT1/CT4/CT7 صفر، عدم تعادل شدید، KWH1/KWH2 خطای فاز.'},
+   sym:'جریان CT1/CT4/CT7 صفر، عدم تعادل شدید، KWH1 و KWH2 خطای فاز.'},
   {id:'F02', t:'قطع فاز S ورودی', cat:'شینه', sev:'high', target:'BUS',
    d:'حذف ولتاژ L2 — انشعاب پریز (سیم 7/8) و ستون MCCB گروه ۲ بی‌برق می‌شود.', sym:'CT2/CT5/CT8 صفر.'},
   {id:'F03', t:'قطع فاز T ورودی', cat:'شینه', sev:'high', target:'BUS',
@@ -16488,7 +16488,7 @@ function defaultState(){
     sw:{ S1:true, S2:true, S1ctrl:false, S1ctrl2:false },
     ct:{}, ctOpen:{},
     tc:{ pv:64.0, sv:80.0, hyst:2.0, relay:false, sensorOK:true, ambient:26, heat:0.10, cool:0.035, out:'ON' },
-    meters:{ KWH1:{e:0,dmd:0}, KWH2:{e:0,dmd:0}, DLOG:{e:0} },
+    meters:{ KWH1:{e:0,dmd:0}, KWH2:{e:0,dmd:0}, DLY:{e:0} },
     faults:{}, alarms:[], alarmLog:[], events:[],
     hist:{ t:[], iR:[], iS:[], iT:[], p:[], v:[], pv:[], iq5:[] },
     checks:{}
@@ -16601,7 +16601,7 @@ const Sim = {
     const dt=this.tickMs/1000*(s.speed||1)/3600;
     s.meters.KWH1.e += Math.max(0,pTot)*dt;
     s.meters.KWH2.e += Math.max(0,pQ5)*dt;
-    s.meters.DLOG.e += Math.max(0,pTot)*dt;
+    s.meters.DLY.e += Math.max(0,pTot)*dt;
     s.meters.KWH1.dmd = Math.max(s.meters.KWH1.dmd, pTot);
     s.meters.KWH2.dmd = Math.max(s.meters.KWH2.dmd, pQ5);
 
@@ -17014,7 +17014,7 @@ const MD = {
     };
     const DLY=meterBox(128,145,34,27.5,'DATA LOGGER',['I1+','I1-','I2+','I2-','I3+','I3-'],[169.3,166.5,164.5,161.7,159.7,156.9]);
     this.T(126.4,158.75,'POWER SUPPLY',{size:4.7,rot:90,ha:'center',color:'#345'});
-    this.DEV('DLOG',145,158.75,34,27.5);
+    this.DEV('DLY',145,158.75,34,27.5);
     ctBank([['CT1',52,167.9],['CT2',60,163.1],['CT3',68,158.3]],128,DLY,[17,18,19,20,21,22],76);
     const K1Y=meterBox(128,112,34,30,'KWH1',['I1+','I1-','I2+','I2-','I3+','I3-'],[139.3,136.5,134.5,131.7,129.7,126.9]);
     this.DEV('KWH1',145,127,34,30);
@@ -17624,7 +17624,7 @@ const SCH = {
     ['CT4','CT5','CT6'].forEach((t,i)=>{ g+=this.ct(t,QX[i],455,{ph:['R','S','T'][i],compact:true}); });
     g+=this.T(110,352,'ردیف ۱',{size:10,anchor:'end',fill:p.mut});
     g+=this.T(110,437,'ردیف ۲',{size:10,anchor:'end',fill:p.mut});
-    g+=this.xref(300,338,210,'→ SHEET 2/5 · DLOG + KWH1','metering');
+    g+=this.xref(300,338,210,'→ SHEET 2/5 · DLY + KWH1','metering');
     /* ---- Q0 ---- */
     g+=this.brk('Q0',150,548,3,46,{ph:['R','S','T'],motor:true,sub:'MCCB WITH MOTOR · 3 PHASE 250A',
       cur:'IN 250A'});
@@ -17671,7 +17671,7 @@ const SCH = {
   /* ======================= SHEET 2 — METERING ======================= */
   sheetMetering(){ const p=this.p, c=Sim.c||Sim.compute(), s=Sim.s, W=this.W;
     const busY={R:150,S:170,T:190,N:210,E:230};
-    let g=this.frame(W,this.H,'SHEET 2/5','اندازه‌گیری و سیگنال — CT1…CT9 · DLOG · KWH1 · KWH2 · F.KWH1&SIG · SIGBOX',
+    let g=this.frame(W,this.H,'SHEET 2/5','اندازه‌گیری و سیگنال — CT1…CT9 · DLY · KWH1 · KWH2 · F.KWH1&SIG · SIGBOX',
       'CT1…CT3 → DATA LOGGER (سیم 17…22) · CT4…CT6 → KWH1 (سیم 11…16) · ولتاژ KWH1 با 29…32 · F.KWH1&SIG 6A 3PHASE Type:C (35…40) · سیگنال 42…44 با بازگشت 41');
     ['R','S','T','N','E'].forEach(k=>{ g+=this.L(70,busY[k],1540,busY[k],(k==='N'||k==='E')?p[k]:this.ph(k),3.2,((k==='N'||k==='E')||c.live(k))?'sflow':'');
       g+=this.T(60,busY[k]+4,BUS.label[k],{size:12,weight:true,italic:true,anchor:'end',fill:(k==='N'||k==='E')?p[k]:this.ph(k)}); });
@@ -17687,7 +17687,7 @@ const SCH = {
       g+=this.L(CX[i],414,CX[i],500,this.ph(k),2.6,'sflow');
       g+=this.ct(t,CX[i],528,{ph:k}); });
     /* --- ثانویه CT → کنتورها --- */
-    g+=this.meter('DLOG',700,272,250,238,'DATA LOGGER',
+    g+=this.meter('DLY',700,272,250,238,'DATA LOGGER',
       ['I1+','I1-','I2+','I2-','I3+','I3-'],
       [['25 N',p.N],['26 L1',this.ph('R')],['27 L2',this.ph('S')],['28 L3',this.ph('T')]]);
     g+=this.meter('KWH1',700,522,250,238,'KWH1',
@@ -17731,7 +17731,7 @@ const SCH = {
       g+=this.PL([[x,696],[x,722],[1216,722],[1216,566+i*30],[1240,566+i*30]],this.ph(k),1.8,'sflow s2')+this.WN(x-34,688,66+i*2); });
     g+=this.PL([[1200,488],[1200,500],[1206,500],[1206,586],[1240,586]],p.N,1.8,'sflow s2')+this.WN(1160,500,63);
     /* --- قرائت زنده --- */
-    g+=[['KWH1',s.meters.KWH1,c.pTot],['KWH2',s.meters.KWH2,c.pQ5],['DLOG',s.meters.DLOG,c.pTot]].map((m,i)=>{
+    g+=[['KWH1',s.meters.KWH1,c.pTot],['KWH2',s.meters.KWH2,c.pQ5],['DLY',s.meters.DLY,c.pTot]].map((m,i)=>{
       return `<g class="sdev" cursor="pointer" onclick="Inspector.show('${m[0]}')">
         <rect x="${70+i*210}" y="774" width="196" height="76" rx="7" fill="${p.fill}" stroke="${p.cyan}" stroke-width="1.4"/>
         ${this.T(82+i*210,794,'قرائت زنده '+m[0],{size:11,weight:true,fill:p.cyan})}
@@ -18020,7 +18020,7 @@ const PANEL = {
       g+=`<circle cx="${w-11}" cy="16" r="4" fill="${b&&b.trip?p.bad:col}"${on?' class="pn-led"':''}/>`;
       if(cmp.motor) g+=`<circle cx="12" cy="${h-14}" r="7" fill="none" stroke="${p.mut}" stroke-width="1.2"/><text x="12" y="${h-11}" font-size="9" fill="${p.mut}" text-anchor="middle" font-weight="800">M</text>`;
     } else if(cmp.type==='METER'){
-      const rd = cmp.tag==='KWH1'? s.meters.KWH1.e : cmp.tag==='KWH2'? s.meters.KWH2.e : cmp.tag==='DLOG'? s.meters.DLOG.e : 0;
+      const rd = cmp.tag==='KWH1'? s.meters.KWH1.e : cmp.tag==='KWH2'? s.meters.KWH2.e : cmp.tag==='DLY'? s.meters.DLY.e : 0;
       g+=`<rect x="6" y="8" width="${w-12}" height="${h-16}" rx="4" fill="#0b1c28" stroke="${p.cyan}" stroke-width="1.6"/>`;
       g+=`<text x="${w/2}" y="22" font-size="10" font-weight="800" fill="${p.cyan}" text-anchor="middle">${U.esc(cmp.tag)}</text>`;
       g+=`<rect x="14" y="28" width="${w-28}" height="20" rx="2" fill="#03080f" stroke="${p.edge}"/>`;
@@ -18216,7 +18216,7 @@ const Views = {
         `<div class="grid g3">
           ${this.kpi('انرژی KWH1 (کل شینه)', U.fmt(s.meters.KWH1.e,2),'kWh','ok',`دیماند: ${U.fmt(s.meters.KWH1.dmd,1)} kW`)}
           ${this.kpi('انرژی KWH2 (گروه 125A)', U.fmt(s.meters.KWH2.e,2),'kWh','ok',`دیماند: ${U.fmt(s.meters.KWH2.dmd,1)} kW`)}
-          ${this.kpi('DATA LOGGER', U.fmt(s.meters.DLOG.e,2),'kWh','ok','ورودی از CT1…CT3 — لیدهای 17…22')}
+          ${this.kpi('DATA LOGGER', U.fmt(s.meters.DLY.e,2),'kWh','ok','ورودی از CT1…CT3 — لیدهای 17…22')}
         </div>`)}`;
   },
   after_live(){ this.live_live(); },
@@ -19559,7 +19559,7 @@ const SCH_CIRCUITS = {
 };
 const SCH_COMPS = {
   power:   ['BUS','Q0','Q1','Q2','Q3','Q5'],
-  metering:['CT1','CT2','CT3','CT4','CT5','CT6','CT7','CT8','CT9','DLOG','KWH1','KWH2','F.KWH1&SIG','MCB16','SIGBOX'],
+  metering:['CT1','CT2','CT3','CT4','CT5','CT6','CT7','CT8','CT9','DLY','KWH1','KWH2','F.KWH1&SIG','MCB16','SIGBOX'],
   aux:     ['F.CONTROL','F.SOCKET','F.LIGHTING','S0','S1','S2','LAMP'],
   control: ['F.CONTROL2','KWH1-AUX','KWH2-AUX','R2','R2-NO','TIMER','Q5-CTRL','Q0-CTRL','NC-TERM','N0'],
   grp125:  ['Q5','CT7','CT8','CT9','KWH2','MCB16','M1','M2','M3']
@@ -19568,7 +19568,7 @@ const CROPS = [
   { id:'bus',    t:'شینه اصلی پنج‌هادی (INCOMING)',        clip:[10,170,478,206], sheet:'power',   wires:'—',
     d:'پنج هادی R·S·T·N·PE با سطح مقطع 25*5Mm² CU از x=16 تا x=472 در yهای 196/191.5/187/182.5/178.' },
   { id:'q0',     t:'Q0 + رایزرهای CT1…CT6',               clip:[40,80,112,178],  sheet:'power',   wires:'11–22',
-    d:'mccb(52,97,3,8,motor=True) با شش CT روی رایزرها؛ CT1…CT3 → DLOG و CT4…CT6 → KWH1.' },
+    d:'mccb(52,97,3,8,motor=True) با شش CT روی رایزرها؛ CT1…CT3 → DLY و CT4…CT6 → KWH1.' },
   { id:'mtr1',   t:'DATA LOGGER و KWH1 (ترمینال‌ها)',      clip:[118,100,262,178],sheet:'metering',wires:'11–34',
     d:'meter(128,145,34,27.5) و meter(128,112,34,30) با زیرنویس ترمینال 11₁…13₂.' },
   { id:'sig',    t:'F.KWH1&SIG + جعبه سیگنال',             clip:[196,96,258,190],sheet:'metering',wires:'35–44',
@@ -19873,19 +19873,19 @@ Object.assign(Views, {
     g+=`<rect width="${W}" height="${H}" fill="#070d18"/><rect x="6" y="6" width="${W-12}" height="${H-12}" fill="none" stroke="${p.line}"/>`;
     g+=`<text x="20" y="24" font-size="12.5" font-weight="800" fill="${p.mut}" font-family="var(--mono)">COMPACT SINGLE-LINE OVERVIEW — REBUILT FROM THE MASTER-DRAWING COORDINATES</text>`;
     /* ---- نوار اندازه‌گیری (بالای شینه) ---- */
-    g+=`<text x="20" y="40" font-size="9" fill="${p.dim}" font-family="var(--mono)">METERING BAND · CT1…CT6 روی رایزرهای Q0 · سیم 11…16 → KWH1 · 17…22 → DLOG</text>`;
+    g+=`<text x="20" y="40" font-size="9" fill="${p.dim}" font-family="var(--mono)">METERING BAND · CT1…CT6 روی رایزرهای Q0 · سیم 11…16 → KWH1 · 17…22 → DLY</text>`;
     const CTX=[['CT1',300,'17'],['CT2',318,'18'],['CT3',336,'19'],['CT4',470,'11'],['CT5',488,'12'],['CT6',506,'13']];
     CTX.forEach(([tag,x,wn],i)=>{ const k=['R','S','T'][i%3];
       g+=SCH.L(x,busY-12,x,110,SCH.ph(k),1.5, s.brk.Q0.closed?'sflow':'');
       g+=`<ellipse cx="${x}" cy="150" rx="7.5" ry="13" fill="none" stroke="${p.ct}" stroke-width="1.7"/>`;
       g+=`<text x="${x}" y="176" font-size="7.6" fill="${p.ct}" text-anchor="middle" font-family="var(--mono)">${tag}</text>`;
       g+=`<text x="${x+11}" y="${busY+24}" font-size="7.6" fill="${p.mag}" font-family="var(--mono)">${wn}</text>`; });
-    [['DLOG',272,'6×I · سیم 17…22','KWH1'], ['KWH1',442,'400/5A · سیم 11…16','KWH2']].forEach(([n,x,cap,mk])=>{
+    [['DLY',272,'6×I · سیم 17…22','KWH1'], ['KWH1',442,'400/5A · سیم 11…16','KWH2']].forEach(([n,x,cap,mk])=>{
       g+=`<rect x="${x}" y="56" width="96" height="42" rx="5" fill="#0d1727" stroke="${p.cyan}" stroke-width="1.3"/>`;
       g+=`<text x="${x+48}" y="74" font-size="11" font-weight="800" fill="${p.cyan}" text-anchor="middle" font-family="var(--mono)">${n}</text>`;
       g+=`<text x="${x+48}" y="88" font-size="8" fill="${p.mut}" text-anchor="middle" font-family="var(--mono)">${U.fmt(s.meters[mk]&&s.meters[mk].e||0,2)} kWh</text>`;
       g+=`<text x="${x+48}" y="50" font-size="7.4" fill="${p.dim}" text-anchor="middle" font-family="var(--mono)">${cap}</text>`;
-      [0,1,2].forEach(j=>{ const sx=(n==='DLOG'?300:470)+j*18;
+      [0,1,2].forEach(j=>{ const sx=(n==='DLY'?300:470)+j*18;
         g+=SCH.PL([[sx,137],[sx,98],[x+20+j*28,98],[x+20+j*28,98]],p.cyan,1.1); }); });
     /* ---- سیگنال + فیوز 6A ---- */
     g+=SCH.L(640,busY-12,640,132,SCH.ph('S'),1.5,'sflow');
